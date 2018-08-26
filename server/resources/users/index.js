@@ -28,7 +28,7 @@ router.get("/api/:alias", usersController.read.one);
 // console.info("...initialised user default RESTful resources.");
 // console.info("Initialising user authentication routes...");
 
-router.get("/auth/login", passport.authenticate('local'), usersController.auth.login);
+router.get("/auth/login", [usersController.auth.login, usersController.views.profile]);
 router.get("/auth", [usersController.auth.check, usersController.auth.resolve]);
 router.get("/auth/logout", usersController.auth.logout);
 
@@ -36,7 +36,8 @@ router.get("/auth/logout", usersController.auth.logout);
 
 // console.info("Initialising server-side view renderers...");
 router.get("/", usersController.views.index);
-router.get("/:alias", usersController.views.profile);
+router.get("/profile/:alias", usersController.views.profile);
+router.get("/logout", usersController.views.logout);
 // console.info("...initialised server-side view renderers.");
 
 console.info(`${metalog.name}: ...Loaded resource.`);

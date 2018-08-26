@@ -142,11 +142,20 @@ exports.read.one = (req, res, next) => {
   // console.info("usersController.read.one(): List account info of a user. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
-  if (req.params) {
+  if (!req.params) {
     // Handle error
+    console.error("...params not found.");
+    response.errors = [];
+    const error = {
+      id: response.errors.length,
+      status: "400",
+      code: "error__users__missing_params",
+      title: "Error",
+      detail: `Missing parameters from request.`
+    };
+    response.errors.push(error);
+    return res.json(response);
   }
-
-  console.log(req.params);
   
   callback = (err, user) => {
     if (user === null) {
@@ -170,7 +179,6 @@ exports.read.one = (req, res, next) => {
         attributes: user
       };
       response.data.push(datum);
-      next(response);
       return res.json(response);
     }
   };
@@ -198,7 +206,7 @@ exports.delete.one = (req, res, next) => {
 };
 
 exports.delete.many = (req, res, next) => {
-  // console.info("usersController.delete.one(): Destroy account info of many users. Invoked...");
+  // console.info("usersController.delete.many(): Destroy account info of many users. Invoked...");
 };
 
 /*
@@ -213,23 +221,22 @@ exports.delete.many = (req, res, next) => {
 exports.auth.login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
   // console.info(`Initialising JSON API v1 standard response structure...`);
-  console.log(req.query);
-  passport.authenticate("local", function(err, user, info) {
-    // console.log(user);
+  passport.authenticate("local", function(err, user) {
     if (err) {
       console.error(err);
       return next(err);
     }
     if (!user) {
       console.log("No user");
-      return res.redirect("/users/");
+      return next(err);
     }
-    console.log("Logged in");
+    console.log(`Logging in ${user.name.alias}...`);
     req.logIn(user, function(err) {
       if (err) {
+        console.error(err);
         return next(err);
       }
-      return res.redirect("/users/" + user.username);
+      return res.redirect("/users/profile/" + user.name.alias);
     });
   })(req, res, next);
 };
@@ -238,25 +245,26 @@ exports.auth.check = (req, res, next) => {
   // console.info("usersController.auth.check(): Authenticating user credentials from session. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
-  console.log(req.user);
+  // console.log(req.user);
   if (req.user) {
-    return next();
+    return next(req.user);
+  } else {
+    response.errors = [];
+    // console.error('...Exception caught while authenticating user.');
+    const error = {
+      id: response.errors.length,
+      status: "401",
+      title: "Error",
+      code: "error__users__user_not_auth",
+      detail: "Failed to authenticate user"
+    };
+    response.errors.push(error);
+    return res.json(response);
   }
-  response.errors = [];
-  console.error('...Exception caught while authenticating user.');
-  const error = {
-    id: response.errors.length,
-    status: "401",
-    title: "Error",
-    code: "error__users__user_not_auth",
-    detail: "Failed to authenticate user"
-  };
-  response.errors.push(error);
-  return res.json(response);
 };
 
 exports.auth.resolve = (req, res, next) => {
-  console.info("usersController.auth.resolve(): Success callback after authentication check. Invoked...");
+  // console.info("usersController.auth.resolve(): Success callback after authentication check. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
   response.data = [];
@@ -268,16 +276,25 @@ exports.auth.resolve = (req, res, next) => {
     detail: "User authenticated"
   };
   response.data.push(datum);
+  const userDetail = {
+    id: 1,
+    status: "200",
+    title: "Success",
+    code: "users__user",
+    detail: req
+  };
+  response.data.push(userDetail);
   res.json(response);
 };
 
 exports.auth.logout = (req, res, next) => {
-  // console.info("usersController.logout(): List account info of many users. Invoked...");
+  // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
+  const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
-  res.redirect('/users');
+  res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`)
 };
 
-exports.views.index = (req, res, next) => {
+exports.views.index = (req, res) => {
   // console.info("usersController.views.index(): View rendering of users index page. Invoked...");
   res.render('users/index', {
     title: 'Users Index',
@@ -285,8 +302,16 @@ exports.views.index = (req, res, next) => {
   })
 };
 
-exports.views.profile = (req, res, next) => {
-  // console.info("usersController.views.profile(): View rendering of users index page. Invoked...");
+exports.views.logout = (req, res) => {
+  // console.info(`usersController.views.logout(): Rendering view of a successful log out of user ${req.query.userIdBeingLoggedOut}. Invoked...`);
+  res.render('users/index', {
+    title: 'Successfully logged out',
+    content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
+  })
+};
+
+exports.views.profile = (req, res) => {
+  console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
   console.log(req.params);
   callback = (err, user) => {
     let data = {};
@@ -317,6 +342,6 @@ exports.views.profile = (req, res, next) => {
 };
 
 exports.views.login = (req, res, next) => {
-  // console.info("usersController.views.profile(): View rendering of users index page. Invoked...");
+  // console.info("usersController.views.login(): Show login page. Invoked...");
   
 };

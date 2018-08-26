@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const Strategy = require("passport-local").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 require("../../../db/mongo")("for user authentication.");
 const User = require("../model");
 let response = {};
@@ -24,21 +24,26 @@ module.exports = (app) => {
   // (`username` and `password`) submitted by the user.  The function must verify
   // that the password is correct and then invoke `cb` with a user object, which
   // will be set at `req.user` in route handlers after authentication.
-  passport.use(new Strategy({
+
+  // To prevent to the "verify callback" approach described in the Passport.js Documentation which requires two instances of the same strategy and supporting routes, the strategy's passReqToCallback option is set to true so that req will be passed as the first argument to the verify callback. With req passed as an argument, the verify callback can use the state of the request to tailor the authentication process, handling both authentication and authorisation using a single strategy instance and set of routes. For example, if a user is already logged in, the newly "connected" account can be associated. Any additional application-specific properties set on req, including req.session, can be used as well. Reference: http://www.passportjs.org/docs/downloads/html/
+
+  passport.use(new LocalStrategy({
     usernameField: "alias",
     passwordField: "password",
     passReqToCallback: true,
     session: false
   }, function(req, alias, password, cb) {
-    // console.log("Query from client: alias - ", alias);
-    // console.log("Query from client: password - ", password);
+    // console.info(`Invoked local user authentication strategy using Passport.js.`)
+    // console.warn(`(Debug) Receiving ${req.url}`);
+    // console.log("(Debug) Query from client: alias - ", alias);
+    // console.log("(Debug) Query from client: password - ", password);
     User.findOne({ 'name.alias': alias }, async (err, user) => {
       if (err) {
         return cb(err);
       }
       // console.log("authenticatedUser:", user);
       if (!user.name.alias) {
-        console.error("Invalid user.");
+        // console.error("Invalid user.");
         const error = {
           id: response.errors.length,
           status: "400",
@@ -59,23 +64,21 @@ module.exports = (app) => {
         });
       });
 
-      console.log("passwordsMatch:", passwordsMatch);
+      // console.log("Compared user-input password. Hashes match:", passwordsMatch);
 
-      if (user.password.hash != hash) {
-        console.error("Invalid password.");
-        console.log("Hashes don't match:", user.password.hash, "!==", hash);
+      if (!passwordsMatch) {
+        // console.error("Invalid password.");
         response.errors = [];
         const error = {
           id: response.errors.length,
           status: "400",
           code: "error__wrong_pw",
           title: "Error",
-          detail: `Password submitted does not match.`
+          detail: `Incorrect password.`
         };
         response.errors.push(error);
         return cb(null, false, response);
       }
-      console.log("Passwords match:", user.password.hash, "===", hash);
       return cb(null, user);
     });
   }));
@@ -88,12 +91,12 @@ module.exports = (app) => {
   // serializing, and querying the user record by ID from the database when
   // deserializing.
   passport.serializeUser(function(user, cb) {
-    console.log("User serialised:", user.name.alias);
+    // console.log("User serialised:", user.name.alias);
     cb(null, user.name.alias);
   });
 
   passport.deserializeUser(function(alias, cb) {
-    console.log("User deserialised:", alias);
+    // console.log("User deserialised:", alias);
     User.findOne({ "name.alias": alias }, function(err, user) {
       if (err) {
         return cb(err);
