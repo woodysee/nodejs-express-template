@@ -1,0 +1,9 @@
+<h1><%= title %></h1>
+<form method="get" action="/users/auth/login" enctype="multipart/form-data">
+  <input type="text" name="alias" placeholder="Username (alias)" />
+  <input type="password" name="password" placeholder="Password" />
+  <button type="submit">
+    Log in
+  </button>
+</form>
+<a href="/users/auth">Check if already logged in</a>

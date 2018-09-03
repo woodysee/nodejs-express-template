@@ -62,7 +62,7 @@ exports.create.one = (req, res, next) => {
       }
     });
 
-    console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
+    // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
 
     if (typeof encodeAttempt === "undefined") {
       response.errors = [];
@@ -98,7 +98,7 @@ exports.create.one = (req, res, next) => {
       }
     }
     newUser.save((err) => {
-      console.log('Attempting to save new user...');
+      // console.log('Attempting to save new user...');
       if (err) {
         response.errors = [];
         console.error('Exception caught while saving user...');
@@ -114,7 +114,7 @@ exports.create.one = (req, res, next) => {
         return res.json(response);
       }
       
-      console.log("...new user successfully saved.");
+      // console.log("...new user successfully saved.");
       response.data = [];
       const datum = {
         id: response.data.length,
@@ -241,6 +241,13 @@ exports.auth.login = (req, res, next) => {
   })(req, res, next);
 };
 
+exports.views.login = (req, res, next) => {
+  console.info("usersController.view.login(): Opens login page.");
+  res.render('users/login', {
+    title: "Login Page"
+  });
+}
+
 exports.auth.check = (req, res, next) => {
   // console.info("usersController.auth.check(): Authenticating user credentials from session. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
@@ -311,8 +318,15 @@ exports.views.logout = (req, res) => {
 };
 
 exports.views.profile = (req, res) => {
-  console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
-  console.log(req.params);
+  // console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
+  // console.log(req.params);
+  console.log(req.user);
+    
+  if (!req.user) {
+    console.log("No user found...");
+    res.redirect("/users/login");
+  }
+
   callback = (err, user) => {
     let data = {};
     if (!user) {
@@ -338,10 +352,5 @@ exports.views.profile = (req, res) => {
   User.findOne()
     .where("name.alias").equals(req.params.alias)
     .exec(callback);
-  
-};
-
-exports.views.login = (req, res, next) => {
-  // console.info("usersController.views.login(): Show login page. Invoked...");
   
 };

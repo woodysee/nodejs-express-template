@@ -36,7 +36,8 @@ router.get("/auth/logout", usersController.auth.logout);
 
 // console.info("Initialising server-side view renderers...");
 router.get("/", usersController.views.index);
-router.get("/profile/:alias", usersController.views.profile);
+router.get("/profile/:alias", [usersController.auth.login, usersController.views.profile]);
+router.get("/login", usersController.views.login);
 router.get("/logout", usersController.views.logout);
 // console.info("...initialised server-side view renderers.");
 
