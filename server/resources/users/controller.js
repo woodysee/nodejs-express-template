@@ -234,7 +234,9 @@ exports.auth.login = (req, res, next) => {
     req.logIn(user, function(err) {
       if (err) {
         console.error(err);
-        return next(err);
+        return res.render('users/login', {
+
+        });
       }
       return res.redirect("/users/profile/" + user.name.alias);
     });
@@ -347,10 +349,15 @@ exports.views.profile = (req, res) => {
         }
       }
     }
-    res.render('users/profile', data)
+    res.render('users/profile', data);
   }
   User.findOne()
     .where("name.alias").equals(req.params.alias)
     .exec(callback);
   
 };
+
+exports.views.signup = (req, res) => {
+  // console.info("usersController.views.signup(): View rendering of user profile page. Invoked...");
+  res.render('users/signup');
+}

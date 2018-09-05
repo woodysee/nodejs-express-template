@@ -6,7 +6,6 @@ console.info(`${metalog.name}: Loading resource...`);
 // console.info(`${metalog.prefix} Importing dependencies...`);
 
 const express = require("express");
-const passport = require("passport");
 const router = express.Router();
 const usersController = require("./controller");
 
@@ -37,6 +36,7 @@ router.get("/auth/logout", usersController.auth.logout);
 // console.info("Initialising server-side view renderers...");
 router.get("/", usersController.views.index);
 router.get("/profile/:alias", [usersController.auth.login, usersController.views.profile]);
+router.get("/signup", usersController.views.signup);
 router.get("/login", usersController.views.login);
 router.get("/logout", usersController.views.logout);
 // console.info("...initialised server-side view renderers.");
