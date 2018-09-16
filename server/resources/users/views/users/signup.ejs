@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <form id="signup-form">
+    <form id="signup-form" method="post" action="/users/api">
       <h1>Sign Up</h1>
       <input type="text" name="alias" value="" placeholder="Alias" /><br/>
       <input type="password" name="password" value="" placeholder="Password" />
@@ -16,7 +16,7 @@
       <br/>
       <input type="text" name="email" value="" placeholder="Email" />
       <hr />
-      <button id="submit-btn" type="button">Submit</button>
+      <button id="submit-btn" type="submit">Submit</button>
     </form>
   </body>
   <script src="js/signup.js"></script>

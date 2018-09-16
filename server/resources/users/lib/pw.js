@@ -93,7 +93,7 @@ saltAndHasher = async (params) => {
     " -> Generating salt-and-hashed password using a local strategy..."
   );
 
-  // console.info("Wrapping bcrypt salting function in a promise in order to use await in this function...");
+  console.info("Wrapping bcrypt salting function in a promise in order to use await in this function...");
   const salt = await new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
       if (err) reject(err);
@@ -101,13 +101,17 @@ saltAndHasher = async (params) => {
     });
   });
 
-  // console.info("Wrapping bcrypt hashing function in a promise in order to use await in this function...");
+  console.log(salt);
+
+  console.info("Wrapping bcrypt hashing function in a promise in order to use await in this function...");
   const hash = await new Promise((resolve, reject) => {
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) reject(err);
       resolve(hash);
     });
   });
+
+  console.log(hash);
 
   let data = [];
 
