@@ -245,7 +245,11 @@ exports.auth.login = (req, res, next) => {
 
 exports.views.login = (req, res, next) => {
   console.info("usersController.view.login(): Opens login page.");
+  if (req.user) {
+    next()
+  }
   res.render('users/login', {
+    loginFailed: false,
     title: "Login Page"
   });
 }
@@ -268,7 +272,8 @@ exports.auth.check = (req, res, next) => {
       detail: "Failed to authenticate user"
     };
     response.errors.push(error);
-    return res.json(response);
+    // return res.json(response);
+    res.render('users/auth', response)
   }
 };
 

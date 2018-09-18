@@ -1,0 +1,6 @@
+<% if (errors) { %>
+  <h1>ID: <%= errors[0].id %><%= errors[0].status %></h1>
+  <h2><%= errors[0].title %></h2>
+  <p><%= errors[0].detail %></p>
+  <a href="/users/login">Go back to login page</a>
+<% } %>
