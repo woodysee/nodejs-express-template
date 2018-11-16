@@ -7,6 +7,10 @@ console.info(`${metalog.name}: Loading resource...`);
 
 const express = require("express");
 const router = express.Router();
+
+const multer = require('multer'); // required to handle multipart form data. See https://www.npmjs.com/package/multer#readme for more information.
+const upload = multer();
+
 const usersController = require("./controller");
 
 // console.info(`${metalog.prefix} ...imported dependencies.`);
@@ -27,9 +31,9 @@ router.get("/api/:alias", usersController.read.one);
 // console.info("...initialised user default RESTful resources.");
 // console.info("Initialising user authentication routes...");
 
-router.get("/auth/login", [usersController.auth.login, usersController.views.profile]);
+router.post("/auth/login", upload.none(), [usersController.auth.login, usersController.views.profile]);
 router.get("/auth", [usersController.auth.check, usersController.auth.resolve]);
-router.get("/auth/logout", usersController.auth.logout);
+router.post("/auth/logout", usersController.auth.logout);
 
 // console.info("...initialised user authentication routes.");
 

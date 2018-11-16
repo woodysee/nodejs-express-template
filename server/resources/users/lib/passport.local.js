@@ -1,7 +1,6 @@
 // Adapted from Jared Hanson https://github.com/passport/express-4.x-local-example/blob/master/server.js
 // console.info('Declaring dependencies...');
 require("dotenv").config();
-
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -39,9 +38,25 @@ module.exports = (app) => {
     // console.log("(Debug) Query from client: password - ", password);
     User.findOne({ 'name.alias': alias }, async (err, user) => {
       if (err) {
+        // console.error(`Error occurred while finding user in the DB:`);
+        // console.error(err);
         return cb(err);
       }
+      if (!user) {
+        console.error(`No such user found:`);
+        const error = {
+          id: response.errors.length,
+          status: "400",
+          code: "error__no_user",
+          title: "Error",
+          detail: `No user.`
+        };
+        response.errors.push(error);
+        return cb(null, false, response);
+      }
+
       // console.log("authenticatedUser:", user);
+      
       if (!user.name.alias) {
         // console.error("Invalid user.");
         const error = {

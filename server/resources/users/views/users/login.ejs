@@ -1,5 +1,5 @@
 <h1><%= title %></h1>
-<form method="get" action="/users/auth/login" enctype="multipart/form-data">
+<form method="post" action="/users/auth/login" enctype="multipart/form-data">
   <% if (loginFailed) { %>
     <div class="top-banner__login-failed">
       Login has failed!
@@ -7,9 +7,7 @@
   <% } %>
   <input type="text" name="alias" placeholder="Username (alias)" autocomplete="off" />
   <input type="password" name="password" placeholder="Password" autocomplete="off" />
-  <button type="submit">
-    Log in
-  </button>
+  <button type="submit">Log in</button>
 </form>
 <a href="/users/auth">Check if already logged in</a>
 <a href="/">Back to Single Page Application</a>

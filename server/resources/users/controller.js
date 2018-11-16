@@ -243,10 +243,13 @@ exports.auth.login = (req, res, next) => {
   })(req, res, next);
 };
 
-exports.views.login = (req, res, next) => {
+exports.views.login = (req, res) => {
   console.info("usersController.view.login(): Opens login page.");
   if (req.user) {
-    next()
+    res.render('users/login', {
+      loginFailed: true,
+      title: "Login Page"
+    });
   }
   res.render('users/login', {
     loginFailed: false,
@@ -277,7 +280,7 @@ exports.auth.check = (req, res, next) => {
   }
 };
 
-exports.auth.resolve = (req, res, next) => {
+exports.auth.resolve = (req, res) => {
   // console.info("usersController.auth.resolve(): Success callback after authentication check. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
@@ -302,7 +305,8 @@ exports.auth.resolve = (req, res, next) => {
 };
 
 exports.auth.logout = (req, res, next) => {
-  // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
+  console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
+  console.log(req.user);
   const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
   res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`)
@@ -313,11 +317,11 @@ exports.views.index = (req, res) => {
   res.render('users/index', {
     title: 'Users Index',
     content: 'For users'
-  })
+  });
 };
 
 exports.views.logout = (req, res) => {
-  // console.info(`usersController.views.logout(): Rendering view of a successful log out of user ${req.query.userIdBeingLoggedOut}. Invoked...`);
+  console.info(`usersController.views.logout(): Rendering view of a successful log out of user ${req.query.userIdBeingLoggedOut}. Invoked...`);
   res.render('users/index', {
     title: 'Successfully logged out',
     content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
@@ -326,19 +330,11 @@ exports.views.logout = (req, res) => {
 
 exports.views.profile = (req, res) => {
   // console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
-  // console.log(req.params);
-  console.log(req.user);
-    
-  if (!req.user) {
-    console.log("No user found...");
-    res.redirect("/users/login");
-  }
-
   callback = (err, user) => {
     let data = {};
     if (!user) {
       data = {
-        title: 'No such user',
+        title: 'Invalid user credentials',
         user: null
       }
     } else {

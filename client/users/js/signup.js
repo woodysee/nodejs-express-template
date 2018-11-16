@@ -25,4 +25,3 @@ function submitSignup() {
   xhr.send(data);
 }
 submitBtnEl.addEventListener("click", submitSignup);
-console.log("hello");
