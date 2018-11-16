@@ -14,12 +14,13 @@ module.exports = (app, morgan) => {
     path: logDirectory
   });
 
-  // // console.log("Using nodemon logger...");
-  // app.use(morgan("combined"));
-
   // console.log("Setting up the logger...");
-  app.use(morgan('combined', {
+  const format = 'combined'; // Possible pre-defined formats: combined, common, dev, short, tiny
+  const options = {
     stream: accessLogStream
-  }));
+  };
+  app.use(morgan(format, options));
 
 }
+
+// Reference: https://github.com/expressjs/morgan
