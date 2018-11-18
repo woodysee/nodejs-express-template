@@ -1,6 +1,16 @@
-<% if (errors) { %>
-  <h1>ID: <%= errors[0].id %><%= errors[0].status %></h1>
+<% if (typeof errors !== 'undefined' && errors !== null) { %>
+
   <h2><%= errors[0].title %></h2>
   <p><%= errors[0].detail %></p>
   <a href="/users/login">Go back to login page</a>
+
+<% } else if (typeof data !== 'undefined' && data !== null) { %>
+
+  <h1>User logged in already!</h1>
+
+  <h2><%= data[0].attributes.name.first %>&nbsp;<%= data[0].attributes.name.last %></h2>
+  <hr />
+  <a href="/users/profile/<%= data[0].attributes.name.alias %>">Go back to <%= data[0].attributes.name.first %>'s Profile Page</a>
+  <a href="/users/auth/logout">Log out</a>
+
 <% } %>

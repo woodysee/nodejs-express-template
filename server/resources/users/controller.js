@@ -257,14 +257,34 @@ exports.views.login = (req, res) => {
   });
 }
 
-exports.auth.check = (req, res, next) => {
+exports.auth.check = (req, res) => {
   // console.info("usersController.auth.check(): Authenticating user credentials from session. Invoked...");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
   // console.log(req.user);
   if (req.user) {
-    return next(req.user);
+    // console.log('...User exists.');
+    response.data = [];
+    const userDetail = {
+      id: req.user.id,
+      type: 'user',
+      attributes: req.user
+    };
+    response.data.push(userDetail);
+    res.format({
+      html() {
+        res.render('users/auth', response);
+      },
+      json() {
+        res.json(response);
+      },
+      default() {
+        res.render('users/auth', response);
+      }
+    });
+
   } else {
+
     response.errors = [];
     // console.error('...Exception caught while authenticating user.');
     const error = {
@@ -276,37 +296,24 @@ exports.auth.check = (req, res, next) => {
     };
     response.errors.push(error);
     // return res.json(response);
-    res.render('users/auth', response)
+    res.format({
+      html() {
+        res.render('users/auth', response);
+      },
+      json() {
+        res.json(response);
+      },
+      default() {
+        res.render('users/auth', response);
+      }
+    });
+    
   }
 };
 
-exports.auth.resolve = (req, res) => {
-  // console.info("usersController.auth.resolve(): Success callback after authentication check. Invoked...");
-  // console.info(`Initialising JSON API v1 standard response structure...`);
-  let response = {};
-  response.data = [];
-  const datum = {
-    id: 0,
-    status: "200",
-    title: "Success",
-    code: "users__user_auth",
-    detail: "User authenticated"
-  };
-  response.data.push(datum);
-  const userDetail = {
-    id: 1,
-    status: "200",
-    title: "Success",
-    code: "users__user",
-    detail: req
-  };
-  response.data.push(userDetail);
-  res.json(response);
-};
-
-exports.auth.logout = (req, res, next) => {
-  console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
-  console.log(req.user);
+exports.auth.logout = (req, res) => {
+  // console.log(req.user);
+  // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
   const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
   res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`)

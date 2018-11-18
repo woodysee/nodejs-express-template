@@ -32,8 +32,8 @@ router.get("/api/:alias", usersController.read.one);
 // console.info("Initialising user authentication routes...");
 
 router.post("/auth/login", upload.none(), [usersController.auth.login, usersController.views.profile]);
-router.get("/auth", [usersController.auth.check, usersController.auth.resolve]);
-router.post("/auth/logout", usersController.auth.logout);
+router.get("/auth", [usersController.auth.check]);
+router.get("/auth/logout", usersController.auth.logout);
 
 // console.info("...initialised user authentication routes.");
 
