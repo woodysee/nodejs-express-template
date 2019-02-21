@@ -1,7 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 
-selectLocalCipher = (params) => {
+const selectLocalCipher = (params) => {
   let response = {};
   switch (params.version) {
     case 0.1:
@@ -20,7 +20,7 @@ selectLocalCipher = (params) => {
   }
 } 
 
-selectPepper = (params) => {
+const selectPepper = (params) => {
   const version = params.version;
   let password = params.key.password;
   switch (params.version) {
@@ -43,7 +43,7 @@ selectPepper = (params) => {
   }
 }
 
-saltAndHasher = async (params) => {
+const saltAndHasher = async (params) => {
   let response = {};
   console.log("params:", params);
   console.info(' -> Validating parameters...');
@@ -177,7 +177,6 @@ exports.encipher = params => {
     return response;
   }
   const cipher = raw.data[0];
-  delete raw;
   switch (version) {
     case 1:
     /**

@@ -8,9 +8,10 @@ module.exports = (app) => {
   ]; // <-- You can add more resource-specific views by adding in here
 
   let locations = [];
-  for (i in resources) {
-    locations.push(`${__dirname}/resources/${resources[i]}/views`);
-  }
+  
+  resources.forEach((resource) => {
+    locations.push(`${__dirname}/resources/${resource}/views`);
+  });
 
   // console.log("Initialising the single view from the single page application...");
   locations.push(`${__dirname}/../client`);
