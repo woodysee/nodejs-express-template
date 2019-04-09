@@ -2,9 +2,8 @@
   "name": "nodejs-server-app",
   "version": "0.1.0",
   "description": "A template with full RESTful user account management for user-account based web apps",
-  "main": "server/build/app.js",
+  "main": "server/app.js",
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
@@ -21,13 +20,8 @@
     "rotating-file-stream": "^1.4.0",
     "uuid": "^3.3.2"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.3",
-    "@babel/preset-env": "^7.3.1"
-  },
   "scripts": {
-    "start": "./node_modules/.bin/babel server --out-dir server/build && node server/build/app.js",
+    "start": "node server/build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
