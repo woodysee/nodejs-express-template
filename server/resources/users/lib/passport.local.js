@@ -44,6 +44,7 @@ module.exports = (app) => {
       }
       if (!user) {
         console.error(`No such user found:`);
+        response.errors = [];
         const error = {
           id: response.errors.length,
           status: "400",
