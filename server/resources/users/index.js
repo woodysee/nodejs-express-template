@@ -46,14 +46,8 @@ router.get("/profile/:alias", [
   usersController.auth.login,
   usersController.views.profile
 ]);
-router.get("/signup", [
-  usersController.views.signup,
-  usersController.views.profile
-]);
-router.get("/login", [
-  usersController.views.login,
-  usersController.views.profile
-]);
+router.get("/signup", usersController.views.signup);
+router.get("/login", usersController.views.login);
 router.get("/logout", usersController.views.logout);
 // console.info("...initialised server-side view renderers.");
 

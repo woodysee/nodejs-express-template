@@ -226,12 +226,12 @@ exports.auth.login = (req, res, next) => {
   passport.authenticate("local", function(errors, user) {
     console.log(errors, user);
     if (errors) {
-      console.error(errors);
-      return next(JSON.stringify(errors));
+      // console.error(errors);
+      return next();
     }
     if (!user) {
       console.log("No user");
-      return next(errors);
+      return next();
     }
     console.log(`Logging in ${user.name.alias}...`);
     req.logIn(user, function(err) {
@@ -244,10 +244,14 @@ exports.auth.login = (req, res, next) => {
   })(req, res, next);
 };
 
-exports.views.login = (req, res, next) => {
-  // console.info("usersController.view.login(): Opens login page.");
+exports.views.login = (req, res) => {
+  console.info("usersController.view.login(): Opens login page.");
   console.log(req.user);
-  if (req.user) next();
+  if (req.user) {
+    console.log('Proceeding to next function...');
+    // next();
+    return res.redirect(`/users/profile/${req.user.name.alias}`);
+  };
   return res.render("users/login", {
     loginFailed: false,
     title: "Login Page"
@@ -273,7 +277,16 @@ exports.auth.check = (req, res) => {
         res.render("users/auth", response);
       },
       json() {
-        res.json(response);
+        res.json({
+          id: req.user.id,
+          status: "200",
+          title: "Success",
+          code: "success__user_already_auth",
+          detail: "An existing user has already been authenticated",
+          meta: {
+            alias: req.user.name.alias,
+          },
+        });
       },
       default() {
         res.render("users/auth", response);
@@ -286,8 +299,8 @@ exports.auth.check = (req, res) => {
       id: response.errors.length,
       status: "401",
       title: "Error",
-      code: "error__users__user_not_auth",
-      detail: "Failed to authenticate user"
+      code: "error__users__no_auth_user",
+      detail: "No authenticated user currently logged in"
     };
     response.errors.push(error);
     // return res.json(response);
@@ -356,7 +369,18 @@ exports.views.profile = (req, res) => {
         },
       };
     }
-    res.render("users/profile", data);
+    
+    res.format({
+      html() {
+        res.render("users/profile", data);
+      },
+      json() {
+        res.json(data);
+      },
+      default() {
+        res.render("users/profile", response);
+      }
+    });
   };
   User.findOne()
     .where("name.alias")
@@ -366,5 +390,8 @@ exports.views.profile = (req, res) => {
 
 exports.views.signup = (req, res) => {
   // console.info("usersController.views.signup(): View rendering of user profile page. Invoked...");
+  if (req.user) {
+    return res.redirect(`/users/profile/${req.user.name.alias}`);
+  }
   res.render("users/signup");
 };
