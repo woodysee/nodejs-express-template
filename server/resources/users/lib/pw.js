@@ -1,7 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 
-const selectLocalCipher = (params) => {
+const selectLocalCipher = params => {
   let response = {};
   switch (params.version) {
     case 0.1:
@@ -18,18 +18,18 @@ const selectLocalCipher = (params) => {
     default:
       return response;
   }
-} 
+};
 
-const selectPepper = (params) => {
+const selectPepper = params => {
   const version = params.version;
   let password = params.key.password;
   switch (params.version) {
     case 0.1:
       /*
-      ** THIS SPACE RESERVED FOR:
-      ** Custom pepper to enhance your password encoding
-      **
-      */
+       ** THIS SPACE RESERVED FOR:
+       ** Custom pepper to enhance your password encoding
+       **
+       */
       const peppered = password;
       return {
         version: version,
@@ -41,12 +41,12 @@ const selectPepper = (params) => {
     default:
       return params;
   }
-}
+};
 
-const saltAndHasher = async (params) => {
+const saltAndHasher = async params => {
   let response = {};
   console.log("params:", params);
-  console.info(' -> Validating parameters...');
+  console.info(" -> Validating parameters...");
   const errors = [];
   if (!params.key.password) {
     const errorAsNoPassWordToEncode = {
@@ -82,8 +82,8 @@ const saltAndHasher = async (params) => {
   if (thereAreErrors) {
     response.errors = errors;
     return response;
-  };
-  console.info(' -> ...validated parameters.');
+  }
+  console.info(" -> ...validated parameters.");
   const password = params.key.password;
   const saltRounds = parseInt(params.key.saltRounds);
   // console.info(' -> Validating password...');
@@ -93,7 +93,9 @@ const saltAndHasher = async (params) => {
     " -> Generating salt-and-hashed password using a local strategy..."
   );
 
-  console.info("Wrapping bcrypt salting function in a promise in order to use await in this function...");
+  console.info(
+    "Wrapping bcrypt salting function in a promise in order to use await in this function..."
+  );
   const salt = await new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
       if (err) reject(err);
@@ -103,7 +105,9 @@ const saltAndHasher = async (params) => {
 
   console.log(salt);
 
-  console.info("Wrapping bcrypt hashing function in a promise in order to use await in this function...");
+  console.info(
+    "Wrapping bcrypt hashing function in a promise in order to use await in this function..."
+  );
   const hash = await new Promise((resolve, reject) => {
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) reject(err);
@@ -179,11 +183,11 @@ exports.encipher = params => {
   const cipher = raw.data[0];
   switch (version) {
     case 1:
-    /**
-     * THIS SPACE RESERVED FOR:
-     * Future strategies for implementing custom password
-     * strategies
-     */
+      /**
+       * THIS SPACE RESERVED FOR:
+       * Future strategies for implementing custom password
+       * strategies
+       */
       break;
     case 0.1:
       key.saltRounds = cipher.attributes.saltRounds;

@@ -19,7 +19,7 @@ const userSchema = new Schema(
       alias: { type: String, unique: true }
     },
     contact: {
-      email: { type: String },
+      email: { type: String }
     },
     password: {
       hash: { type: String },

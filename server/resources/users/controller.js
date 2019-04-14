@@ -33,105 +33,109 @@ exports.create.one = (req, res, next) => {
   // console.info("usersController.create.one(): Creates a new user. Invoked...");
   const data = req.body;
   // console.log(JSON.stringify(data));
-  
-  User.findOne({ name: { alias: data.name.alias } }, async (err, existingUser) => {
-    if (existingUser) {
-      response.errors = [];
-      const error = {
-        id: response.errors.length,
-        status: "400",
-        code: "error__users__user_name_alias_already_taken",
-        title: "Error",
-        detail: `User name alias (${existingUser.name.alias}) is already taken and must be unique.`
-      };
-      response.errors.push(error);
-      return res.json(response);
-    }
 
-    let newUser = new User();
-    newUser.id = uuidv5(data.name.alias, uuidv4());
-    newUser.name.first = data.name.first;
-    newUser.name.last = data.name.last;
-    newUser.name.alias = data.name.alias;
-    newUser.contact.email = data.contact.email;
-      
-    const encodeAttempt = await pw.encipher({
-      version: strategyVersion,
-      key: {
-        password: data.password
-      }
-    });
-
-    // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
-
-    if (typeof encodeAttempt === "undefined") {
-      response.errors = [];
-      const error = {
-        id: response.errors.length,
-        status: "500",
-        code: "error__users__pw_encoding_failed",
-        title: "Error",
-        detail: `Encoding password failed. This error handler was probably invoked without awaiting pw.permaEncode() to synchronously return the encoded password.`
-      };
-      response.errors.push(error);
-      return res.json(response);
-    }
-
-    const encodingHasErrors = typeof encodeAttempt.errors !== "undefined";
-
-    if (encodingHasErrors) {
-      return res.json(encodeAttempt);
-    }
-
-    // console.log(encodeAttempt);
-
-    for (i in encodeAttempt.data) {
-      let datum = encodeAttempt.data[i];
-      console.info(JSON.stringify(datum));
-      switch (datum.type) {
-        case "password":
-          newUser.password.hash = datum.attributes.hash;
-          newUser.password.strategy = strategyVersion;
-          break;
-        default:
-          break;
-      }
-    }
-    newUser.save((err) => {
-      // console.log('Attempting to save new user...');
-      if (err) {
+  User.findOne(
+    { name: { alias: data.name.alias } },
+    async (err, existingUser) => {
+      if (existingUser) {
         response.errors = [];
-        console.error('Exception caught while saving user...');
         const error = {
           id: response.errors.length,
-          status: "500",
+          status: "400",
+          code: "error__users__user_name_alias_already_taken",
           title: "Error",
-          code: "error__users__user_not_saved",
-          detail: "Failed to save new user",
-          meta: err
+          detail: `User name alias (${
+            existingUser.name.alias
+          }) is already taken and must be unique.`
         };
         response.errors.push(error);
         return res.json(response);
       }
-      
-      // console.log("...new user successfully saved.");
-      response.data = [];
-      const datum = {
-        id: response.data.length,
-        status: "200",
-        code: "success__users__user_saved",
-        title: "Success",
-        attributes: {
-          alias: newUser.name.alias,
-          email: newUser.contact.email
+
+      let newUser = new User();
+      newUser.id = uuidv5(data.name.alias, uuidv4());
+      newUser.name.first = data.name.first;
+      newUser.name.last = data.name.last;
+      newUser.name.alias = data.name.alias;
+      newUser.contact.email = data.contact.email;
+
+      const encodeAttempt = await pw.encipher({
+        version: strategyVersion,
+        key: {
+          password: data.password
         }
-      };
-      response.data.push(datum);
-      next(response);
-      return res.json(response);
-      
-    });
-  });
+      });
+
+      // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
+
+      if (typeof encodeAttempt === "undefined") {
+        response.errors = [];
+        const error = {
+          id: response.errors.length,
+          status: "500",
+          code: "error__users__pw_encoding_failed",
+          title: "Error",
+          detail: `Encoding password failed. This error handler was probably invoked without awaiting pw.permaEncode() to synchronously return the encoded password.`
+        };
+        response.errors.push(error);
+        return res.json(response);
+      }
+
+      const encodingHasErrors = typeof encodeAttempt.errors !== "undefined";
+
+      if (encodingHasErrors) {
+        return res.json(encodeAttempt);
+      }
+
+      // console.log(encodeAttempt);
+
+      for (i in encodeAttempt.data) {
+        let datum = encodeAttempt.data[i];
+        console.info(JSON.stringify(datum));
+        switch (datum.type) {
+          case "password":
+            newUser.password.hash = datum.attributes.hash;
+            newUser.password.strategy = strategyVersion;
+            break;
+          default:
+            break;
+        }
+      }
+      newUser.save(err => {
+        // console.log('Attempting to save new user...');
+        if (err) {
+          response.errors = [];
+          console.error("Exception caught while saving user...");
+          const error = {
+            id: response.errors.length,
+            status: "500",
+            title: "Error",
+            code: "error__users__user_not_saved",
+            detail: "Failed to save new user",
+            meta: err
+          };
+          response.errors.push(error);
+          return res.json(response);
+        }
+
+        // console.log("...new user successfully saved.");
+        response.data = [];
+        const datum = {
+          id: response.data.length,
+          status: "200",
+          code: "success__users__user_saved",
+          title: "Success",
+          attributes: {
+            alias: newUser.name.alias,
+            email: newUser.contact.email
+          }
+        };
+        response.data.push(datum);
+        next(response);
+        return res.json(response);
+      });
+    }
+  );
 };
 
 exports.create.many = (req, res, next) => {
@@ -156,7 +160,7 @@ exports.read.one = (req, res, next) => {
     response.errors.push(error);
     return res.json(response);
   }
-  
+
   callback = (err, user) => {
     if (user === null) {
       console.error("...user not found.");
@@ -184,9 +188,9 @@ exports.read.one = (req, res, next) => {
   };
 
   User.findOne()
-    .where("name.alias").equals(req.params.alias)
+    .where("name.alias")
+    .equals(req.params.alias)
     .exec(callback);
-
 };
 
 exports.read.many = (req, res, next) => {
@@ -210,13 +214,13 @@ exports.delete.many = (req, res, next) => {
 };
 
 /*
-** Three pieces need to be configured to use Passport for authentication:
-**
-** - Authentication strategies
-** - Application middleware
-** - Sessions (optional)
-**
-*/
+ ** Three pieces need to be configured to use Passport for authentication:
+ **
+ ** - Authentication strategies
+ ** - Application middleware
+ ** - Sessions (optional)
+ **
+ */
 
 exports.auth.login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
@@ -234,9 +238,7 @@ exports.auth.login = (req, res, next) => {
     req.logIn(user, function(err) {
       if (err) {
         console.error(err);
-        return res.render('users/login', {
-
-        });
+        return res.render("users/login", {});
       }
       return res.redirect("/users/profile/" + user.name.alias);
     });
@@ -246,16 +248,16 @@ exports.auth.login = (req, res, next) => {
 exports.views.login = (req, res) => {
   console.info("usersController.view.login(): Opens login page.");
   if (req.user) {
-    res.render('users/login', {
+    res.render("users/login", {
       loginFailed: true,
       title: "Login Page"
     });
   }
-  res.render('users/login', {
+  res.render("users/login", {
     loginFailed: false,
     title: "Login Page"
   });
-}
+};
 
 exports.auth.check = (req, res) => {
   // console.info("usersController.auth.check(): Authenticating user credentials from session. Invoked...");
@@ -267,24 +269,22 @@ exports.auth.check = (req, res) => {
     response.data = [];
     const userDetail = {
       id: req.user.id,
-      type: 'user',
+      type: "user",
       attributes: req.user
     };
     response.data.push(userDetail);
     res.format({
       html() {
-        res.render('users/auth', response);
+        res.render("users/auth", response);
       },
       json() {
         res.json(response);
       },
       default() {
-        res.render('users/auth', response);
+        res.render("users/auth", response);
       }
     });
-
   } else {
-
     response.errors = [];
     // console.error('...Exception caught while authenticating user.');
     const error = {
@@ -298,16 +298,15 @@ exports.auth.check = (req, res) => {
     // return res.json(response);
     res.format({
       html() {
-        res.render('users/auth', response);
+        res.render("users/auth", response);
       },
       json() {
         res.json(response);
       },
       default() {
-        res.render('users/auth', response);
+        res.render("users/auth", response);
       }
     });
-    
   }
 };
 
@@ -316,23 +315,27 @@ exports.auth.logout = (req, res) => {
   // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
   const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
-  res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`)
+  res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`);
 };
 
 exports.views.index = (req, res) => {
   // console.info("usersController.views.index(): View rendering of users index page. Invoked...");
-  res.render('users/index', {
-    title: 'Users Index',
-    content: 'For users'
+  res.render("users/index", {
+    title: "Users Index",
+    content: "For users"
   });
 };
 
 exports.views.logout = (req, res) => {
-  console.info(`usersController.views.logout(): Rendering view of a successful log out of user ${req.query.userIdBeingLoggedOut}. Invoked...`);
-  res.render('users/index', {
-    title: 'Successfully logged out',
+  console.info(
+    `usersController.views.logout(): Rendering view of a successful log out of user ${
+      req.query.userIdBeingLoggedOut
+    }. Invoked...`
+  );
+  res.render("users/index", {
+    title: "Successfully logged out",
     content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
-  })
+  });
 };
 
 exports.views.profile = (req, res) => {
@@ -341,12 +344,12 @@ exports.views.profile = (req, res) => {
     let data = {};
     if (!user) {
       data = {
-        title: 'Invalid user credentials',
+        title: "Invalid user credentials",
         user: null
-      }
+      };
     } else {
       data = {
-        title: 'User Profile',
+        title: "User Profile",
         user: {
           name: {
             first: user.name.first,
@@ -355,17 +358,17 @@ exports.views.profile = (req, res) => {
           },
           email: user.contact.email
         }
-      }
+      };
     }
-    res.render('users/profile', data);
-  }
+    res.render("users/profile", data);
+  };
   User.findOne()
-    .where("name.alias").equals(req.params.alias)
+    .where("name.alias")
+    .equals(req.params.alias)
     .exec(callback);
-  
 };
 
 exports.views.signup = (req, res) => {
   // console.info("usersController.views.signup(): View rendering of user profile page. Invoked...");
-  res.render('users/signup');
-}
+  res.render("users/signup");
+};
