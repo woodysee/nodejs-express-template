@@ -31,11 +31,10 @@ exports.create.one = (req, res, next) => {
   // console.info(`Initialising JSON API v1 standard response structure...`);
   let response = {};
   // console.info("usersController.create.one(): Creates a new user. Invoked...");
-  const data = req.body;
-  // console.log(JSON.stringify(data));
-
+  const rawNewUserData = req.body;
+  const alias = rawNewUserData.alias;
   User.findOne(
-    { name: { alias: data.name.alias } },
+    { "name.alias": alias },
     async (err, existingUser) => {
       if (existingUser) {
         response.errors = [];
@@ -53,17 +52,17 @@ exports.create.one = (req, res, next) => {
       }
 
       let newUser = new User();
-      newUser.id = uuidv5(data.name.alias, uuidv4());
-      newUser.name.first = data.name.first;
-      newUser.name.last = data.name.last;
-      newUser.name.alias = data.name.alias;
-      newUser.contact.email = data.contact.email;
+      newUser.id = uuidv5(rawNewUserData.alias, uuidv4());
+      newUser.name.first = rawNewUserData.firstName;
+      newUser.name.last = rawNewUserData.lastName;
+      newUser.name.alias = rawNewUserData.alias;
+      newUser.contact.email = rawNewUserData.email;
 
       const encodeAttempt = await pw.encipher({
         version: strategyVersion,
         key: {
-          password: data.password
-        }
+          password: rawNewUserData.password
+        },
       });
 
       // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
@@ -91,7 +90,6 @@ exports.create.one = (req, res, next) => {
 
       for (i in encodeAttempt.data) {
         let datum = encodeAttempt.data[i];
-        console.info(JSON.stringify(datum));
         switch (datum.type) {
           case "password":
             newUser.password.hash = datum.attributes.hash;
@@ -225,14 +223,15 @@ exports.delete.many = (req, res, next) => {
 exports.auth.login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
   // console.info(`Initialising JSON API v1 standard response structure...`);
-  passport.authenticate("local", function(err, user) {
-    if (err) {
-      console.error(err);
-      return next(err);
+  passport.authenticate("local", function(errors, user) {
+    console.log(errors, user);
+    if (errors) {
+      console.error(errors);
+      return next(JSON.stringify(errors));
     }
     if (!user) {
       console.log("No user");
-      return next(err);
+      return next(errors);
     }
     console.log(`Logging in ${user.name.alias}...`);
     req.logIn(user, function(err) {
@@ -240,20 +239,16 @@ exports.auth.login = (req, res, next) => {
         console.error(err);
         return res.render("users/login", {});
       }
-      return res.redirect("/users/profile/" + user.name.alias);
+      return res.redirect(`/users/profile/${user.name.alias}`);
     });
   })(req, res, next);
 };
 
-exports.views.login = (req, res) => {
-  console.info("usersController.view.login(): Opens login page.");
-  if (req.user) {
-    res.render("users/login", {
-      loginFailed: true,
-      title: "Login Page"
-    });
-  }
-  res.render("users/login", {
+exports.views.login = (req, res, next) => {
+  // console.info("usersController.view.login(): Opens login page.");
+  console.log(req.user);
+  if (req.user) next();
+  return res.render("users/login", {
     loginFailed: false,
     title: "Login Page"
   });
@@ -339,13 +334,14 @@ exports.views.logout = (req, res) => {
 };
 
 exports.views.profile = (req, res) => {
-  // console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
+  console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
+  const alias = req.user ? req.user.name.alias : req.params.alias;
   callback = (err, user) => {
     let data = {};
     if (!user) {
       data = {
         title: "Invalid user credentials",
-        user: null
+        user: null,
       };
     } else {
       data = {
@@ -354,17 +350,17 @@ exports.views.profile = (req, res) => {
           name: {
             first: user.name.first,
             last: user.name.last,
-            alias: user.name.alias
+            alias: user.name.alias,
           },
-          email: user.contact.email
-        }
+          email: user.contact.email,
+        },
       };
     }
     res.render("users/profile", data);
   };
   User.findOne()
     .where("name.alias")
-    .equals(req.params.alias)
+    .equals(alias)
     .exec(callback);
 };
 

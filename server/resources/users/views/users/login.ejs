@@ -9,5 +9,11 @@
   <input type="password" name="password" placeholder="Password" autocomplete="off" />
   <button type="submit">Log in</button>
 </form>
+<% if (typeof errors !== 'undefined' && errors !== null) { %>
+  <% errors.forEach((error) => { %>
+    <%= error.title %>:<%= error.detail %>
+  <% }); %>
+<% } %>
+<br/>
 <a href="/users/auth">Check if already logged in</a>
 <a href="/">Back to Single Page Application</a>

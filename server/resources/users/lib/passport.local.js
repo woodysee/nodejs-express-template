@@ -6,7 +6,6 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 require("../../../db/mongo")("for user authentication.");
 const User = require("../model");
-let response = {};
 
 module.exports = app => {
   // Use application-level middleware for common functionality, including
@@ -21,7 +20,7 @@ module.exports = app => {
   //
   // The local strategy require a `verify` function which receives the credentials
   // (`username` and `password`) submitted by the user.  The function must verify
-  // that the password is correct and then invoke `cb` with a user object, which
+  // that the password is correct and then invoke `done` with a user object, which
   // will be set at `req.user` in route handlers after authentication.
 
   // To prevent to the "verify callback" approach described in the Passport.js Documentation which requires two instances of the same strategy and supporting routes, the strategy's passReqToCallback option is set to true so that req will be passed as the first argument to the verify callback. With req passed as an argument, the verify callback can use the state of the request to tailor the authentication process, handling both authentication and authorisation using a single strategy instance and set of routes. For example, if a user is already logged in, the newly "connected" account can be associated. Any additional application-specific properties set on req, including req.session, can be used as well. Reference: http://www.passportjs.org/docs/downloads/html/
@@ -34,44 +33,54 @@ module.exports = app => {
         passReqToCallback: true,
         session: false
       },
-      function(req, alias, password, cb) {
+      function(req, alias, password, done) {
         // console.info(`Invoked local user authentication strategy using Passport.js.`)
         // console.warn(`(Debug) Receiving ${req.url}`);
         // console.log("(Debug) Query from client: alias - ", alias);
         // console.log("(Debug) Query from client: password - ", password);
         User.findOne({ "name.alias": alias }, async (err, user) => {
+          const errors = [];
           if (err) {
             // console.error(`Error occurred while finding user in the DB:`);
             // console.error(err);
-            return cb(err);
+            errors.push({
+              id: errors.length,
+              status: "500",
+              code: "error__db_query_failed",
+              title: "Error",
+              detail: `Unable to execute query to find the user to authenticate with the alias provided.`,
+              meta: {
+                alias
+              }
+            });
           }
           if (!user) {
-            console.error(`No such user found:`);
-            response.errors = [];
-            const error = {
-              id: response.errors.length,
+            // console.error(`No such user found:`);
+            errors.push({
+              id: errors.length,
               status: "400",
               code: "error__no_user",
               title: "Error",
-              detail: `No user.`
-            };
-            response.errors.push(error);
-            return cb(null, false, response);
+              detail: `Unable to find the user with the alias provided.`,
+              meta: {
+                alias
+              }
+            });
+            return done(errors, false);
           }
 
           // console.log("authenticatedUser:", user);
 
           if (!user.name.alias) {
             // console.error("Invalid user.");
-            const error = {
-              id: response.errors.length,
+            errors.push({
+              id: errors.length,
               status: "400",
               code: "error__invalid_user",
               title: "Error",
               detail: `No such user with alias ${user.name.alias}.`
-            };
-            response.errors.push(error);
-            return cb(null, false, response);
+            });
+            return done(errors, false);
           }
 
           const hash = user.password.hash;
@@ -86,19 +95,21 @@ module.exports = app => {
           // console.log("Compared user-input password. Hashes match:", passwordsMatch);
 
           if (!passwordsMatch) {
-            // console.error("Invalid password.");
-            response.errors = [];
-            const error = {
-              id: response.errors.length,
+            console.error("Invalid password.");
+            errors.push({
+              id: errors.length,
               status: "400",
               code: "error__wrong_pw",
               title: "Error",
               detail: `Incorrect password.`
-            };
-            response.errors.push(error);
-            return cb(null, false, response);
+            });
+            return done(errors, false);
           }
-          return cb(null, user);
+
+          console.log(
+            "...user has been locally configured for Passport authentication."
+          );
+          return done(null, user);
         });
       }
     )
@@ -111,17 +122,24 @@ module.exports = app => {
   // typical implementation of this is as simple as supplying the user ID when
   // serializing, and querying the user record by ID from the database when
   // deserializing.
+  //
+  // Understanding serialize and deserialize better: https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
   passport.serializeUser(function(user, cb) {
     // console.log("User serialised:", user.name.alias);
+    // console.log("Saving user.name.alias to req.session.passport.user = {name: {alias: '...'}}");
     cb(null, user.name.alias);
   });
 
   passport.deserializeUser(function(alias, cb) {
-    // console.log("User deserialised:", alias);
+    // console.log("Querying database with alias:", alias);
     User.findOne({ "name.alias": alias }, function(err, user) {
       if (err) {
+        console.log("Unable to find user to deserialise user.");
         return cb(err);
       }
+      console.log(
+        "Attaching user object to the Express request as req.user..."
+      );
       cb(null, user);
     });
   });

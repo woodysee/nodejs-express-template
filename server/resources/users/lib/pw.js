@@ -123,8 +123,8 @@ const saltAndHasher = async params => {
     id: data.length,
     type: "password",
     attributes: {
-      hash: hash
-    }
+      hash,
+    },
   };
 
   data.push(datum);
@@ -190,10 +190,10 @@ exports.encipher = params => {
        */
       break;
     case 0.1:
-      key.saltRounds = cipher.attributes.saltRounds;
+      params.key.saltRounds = cipher.attributes.saltRounds;
       pepperedArguments = selectPepper({
-        version: version,
-        key: key
+        version,
+        key: params.key
       });
       const response = saltAndHasher(pepperedArguments);
       return response;

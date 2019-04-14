@@ -46,7 +46,10 @@ router.get("/profile/:alias", [
   usersController.auth.login,
   usersController.views.profile
 ]);
-router.get("/signup", usersController.views.signup);
+router.get("/signup", [
+  usersController.views.signup,
+  usersController.views.profile
+]);
 router.get("/login", [
   usersController.views.login,
   usersController.views.profile
