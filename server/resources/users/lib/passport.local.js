@@ -95,7 +95,7 @@ module.exports = app => {
           // console.log("Compared user-input password. Hashes match:", passwordsMatch);
 
           if (!passwordsMatch) {
-            console.error("Invalid password.");
+            // console.error("Invalid password.");
             errors.push({
               id: errors.length,
               status: "400",
@@ -106,9 +106,9 @@ module.exports = app => {
             return done(errors, false);
           }
 
-          console.log(
-            "...user has been locally configured for Passport authentication."
-          );
+          // console.log(
+          //   "...user has been locally configured for Passport authentication."
+          // );
           return done(null, user);
         });
       }
@@ -134,12 +134,12 @@ module.exports = app => {
     // console.log("Querying database with alias:", alias);
     User.findOne({ "name.alias": alias }, function(err, user) {
       if (err) {
-        console.log("Unable to find user to deserialise user.");
+        // console.log("Unable to find user to deserialise user.");
         return cb(err);
       }
-      console.log(
-        "Attaching user object to the Express request as req.user..."
-      );
+      // console.log(
+      //   "Attaching user object to the Express request as req.user..."
+      // );
       cb(null, user);
     });
   });

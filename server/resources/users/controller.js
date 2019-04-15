@@ -33,107 +33,140 @@ exports.create.one = (req, res, next) => {
   // console.info("usersController.create.one(): Creates a new user. Invoked...");
   const rawNewUserData = req.body;
   const alias = rawNewUserData.alias;
-  User.findOne(
-    { "name.alias": alias },
-    async (err, existingUser) => {
-      if (existingUser) {
-        response.errors = [];
-        const error = {
-          id: response.errors.length,
-          status: "400",
-          code: "error__users__user_name_alias_already_taken",
-          title: "Error",
-          detail: `User name alias (${
-            existingUser.name.alias
-          }) is already taken and must be unique.`
-        };
-        response.errors.push(error);
-        return res.json(response);
-      }
-
-      let newUser = new User();
-      newUser.id = uuidv5(rawNewUserData.alias, uuidv4());
-      newUser.name.first = rawNewUserData.firstName;
-      newUser.name.last = rawNewUserData.lastName;
-      newUser.name.alias = rawNewUserData.alias;
-      newUser.contact.email = rawNewUserData.email;
-
-      const encodeAttempt = await pw.encipher({
-        version: strategyVersion,
-        key: {
-          password: rawNewUserData.password
+  User.findOne({ "name.alias": alias }, async (err, existingUser) => {
+    if (existingUser) {
+      response.errors = [];
+      const error = {
+        id: response.errors.length,
+        status: "400",
+        code: "error__users__user_name_alias_already_taken",
+        title: "Error",
+        detail: `User name alias is already taken and must be unique.`,
+        meta: {
+          alias: existingUser.name.alias
+        }
+      };
+      response.errors.push(error);
+      return res.format({
+        html() {
+          console.error(response);
+          res.locals.errors = response.errors;
+          return res.redirect("/users/signup");
         },
+        json() {
+      return res.json(response);
+        },
+        default() {
+          console.error(response);
+          res.locals.errors = response.errors;
+          return res.redirect("/users/signup");
+    }
       });
+    }
 
-      // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
+    let newUser = new User();
+    newUser.id = uuidv5(rawNewUserData.alias, uuidv4());
+    newUser.name.first = rawNewUserData.firstName;
+    newUser.name.last = rawNewUserData.lastName;
+    newUser.name.alias = rawNewUserData.alias;
+    newUser.contact.email = rawNewUserData.email;
 
-      if (typeof encodeAttempt === "undefined") {
+    const encodeAttempt = await pw.encipher({
+      version: strategyVersion,
+      key: {
+        password: rawNewUserData.password
+      }
+    });
+
+    // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
+
+    if (typeof encodeAttempt === "undefined") {
+      response.errors = [];
+      const error = {
+        id: response.errors.length,
+        status: "500",
+        code: "error__users__pw_encoding_failed",
+        title: "Error",
+        detail: `Encoding password failed. This error handler was probably invoked without awaiting pw.permaEncode() to synchronously return the encoded password.`
+      };
+      response.errors.push(error);
+      return res.json(response);
+    }
+
+    const encodingHasErrors = typeof encodeAttempt.errors !== "undefined";
+
+    if (encodingHasErrors) {
+      return res.format({
+        html() {
+          console.error(encodeAttempt);
+          return res.redirect(`users/index`);
+        },
+        json() {
+          res.json(encodeAttempt);
+        },
+        default() {
+          console.error(encodeAttempt);
+          return res.redirect("users/index");
+    }
+      });
+    }
+
+    // console.log(encodeAttempt);
+
+    for (i in encodeAttempt.data) {
+      let datum = encodeAttempt.data[i];
+      switch (datum.type) {
+        case "password":
+          newUser.password.hash = datum.attributes.hash;
+          newUser.password.strategy = strategyVersion;
+          break;
+        default:
+          break;
+      }
+    }
+    newUser.save(err => {
+      // console.log('Attempting to save new user...');
+      if (err) {
         response.errors = [];
+        console.error("Exception caught while saving user...");
         const error = {
           id: response.errors.length,
           status: "500",
-          code: "error__users__pw_encoding_failed",
           title: "Error",
-          detail: `Encoding password failed. This error handler was probably invoked without awaiting pw.permaEncode() to synchronously return the encoded password.`
+          code: "error__users__user_not_saved",
+          detail: "Failed to save new user",
+          meta: err
         };
         response.errors.push(error);
         return res.json(response);
       }
 
-      const encodingHasErrors = typeof encodeAttempt.errors !== "undefined";
-
-      if (encodingHasErrors) {
-        return res.json(encodeAttempt);
-      }
-
-      // console.log(encodeAttempt);
-
-      for (i in encodeAttempt.data) {
-        let datum = encodeAttempt.data[i];
-        switch (datum.type) {
-          case "password":
-            newUser.password.hash = datum.attributes.hash;
-            newUser.password.strategy = strategyVersion;
-            break;
-          default:
-            break;
+      // console.log("...new user successfully saved.");
+      response.data = [];
+      const datum = {
+        id: response.data.length,
+        status: "200",
+        code: "success__users__user_saved",
+        title: "Success",
+        attributes: {
+          alias: newUser.name.alias,
+          email: newUser.contact.email
         }
-      }
-      newUser.save(err => {
-        // console.log('Attempting to save new user...');
-        if (err) {
-          response.errors = [];
-          console.error("Exception caught while saving user...");
-          const error = {
-            id: response.errors.length,
-            status: "500",
-            title: "Error",
-            code: "error__users__user_not_saved",
-            detail: "Failed to save new user",
-            meta: err
-          };
-          response.errors.push(error);
-          return res.json(response);
+      };
+      response.data.push(datum);
+      return res.format({
+        html() {
+          return res.redirect(`users/profile/${newUser.name.alias}`);
+        },
+        json() {
+          res.json(response);
+        },
+        default() {
+          return res.render("users/index", response);
         }
-
-        // console.log("...new user successfully saved.");
-        response.data = [];
-        const datum = {
-          id: response.data.length,
-          status: "200",
-          code: "success__users__user_saved",
-          title: "Success",
-          attributes: {
-            alias: newUser.name.alias,
-            email: newUser.contact.email
-          }
-        };
-        response.data.push(datum);
-        next(response);
-        return res.json(response);
-      });
-    }
-  );
+    });
+  });
+  });
 };
 
 exports.create.many = (req, res, next) => {
@@ -146,7 +179,7 @@ exports.read.one = (req, res, next) => {
   let response = {};
   if (!req.params) {
     // Handle error
-    console.error("...params not found.");
+    // console.error("...params not found.");
     response.errors = [];
     const error = {
       id: response.errors.length,
@@ -156,12 +189,22 @@ exports.read.one = (req, res, next) => {
       detail: `Missing parameters from request.`
     };
     response.errors.push(error);
-    return res.json(response);
+    return res.format({
+      html() {
+        return res.render("users/index", response);
+      },
+      json() {
+        res.json(response);
+      },
+      default() {
+        return res.render("users/index", response);
+      }
+    });
   }
 
   callback = (err, user) => {
     if (user === null) {
-      console.error("...user not found.");
+      // console.error("...user not found.");
       response.errors = [];
       const error = {
         id: response.errors.length,
@@ -172,7 +215,17 @@ exports.read.one = (req, res, next) => {
         meta: err
       };
       response.errors.push(error);
-      return res.json(response);
+      return res.format({
+        html() {
+          return res.render("users/index", response);
+        },
+        json() {
+          res.json(response);
+        },
+        default() {
+          return res.render("users/index", response);
+        }
+      });
     } else {
       response.data = [];
       const datum = {
@@ -181,7 +234,17 @@ exports.read.one = (req, res, next) => {
         attributes: user
       };
       response.data.push(datum);
-      return res.json(response);
+      return res.format({
+        html() {
+          return res.render("users/auth", response);
+        },
+        json() {
+          res.json(response);
+        },
+        default() {
+          return res.render("users/auth", response);
+        }
+      });
     }
   };
 
@@ -224,20 +287,30 @@ exports.auth.login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
   // console.info(`Initialising JSON API v1 standard response structure...`);
   passport.authenticate("local", function(errors, user) {
-    console.log(errors, user);
+    // console.log(errors, user);
     if (errors) {
       // console.error(errors);
+      res.locals.errors = errors;
       return next();
     }
     if (!user) {
-      console.log("No user");
       return next();
     }
-    console.log(`Logging in ${user.name.alias}...`);
+    // console.log(`Logging in ${user.name.alias}...`);
     req.logIn(user, function(err) {
       if (err) {
-        console.error(err);
-        return res.render("users/login", {});
+        // console.error(err);
+        return res.format({
+          html() {
+            return res.render("users/index", { errors: [err] });
+          },
+          json() {
+            res.json({ errors: [err] });
+          },
+          default() {
+            return res.render("users/index", { errors: [err] });
+      }
+        });
       }
       return res.redirect(`/users/profile/${user.name.alias}`);
     });
@@ -245,16 +318,19 @@ exports.auth.login = (req, res, next) => {
 };
 
 exports.views.login = (req, res) => {
-  console.info("usersController.view.login(): Opens login page.");
-  console.log(req.user);
+  // console.info("usersController.view.login(): Opens login page.");
+  // console.log(req.user);
   if (req.user) {
-    console.log('Proceeding to next function...');
-    // next();
     return res.redirect(`/users/profile/${req.user.name.alias}`);
-  };
+  }
+  if (res.locals.errors && res.locals.errors.length > 0) {
+    return res.render("users/login", {
+      loginFailed: true,
+      errors: res.locals.errors
+    });
+  }
   return res.render("users/login", {
-    loginFailed: false,
-    title: "Login Page"
+    loginFailed: false
   });
 };
 
@@ -272,24 +348,24 @@ exports.auth.check = (req, res) => {
       attributes: req.user
     };
     response.data.push(userDetail);
-    res.format({
+    return res.format({
       html() {
-        res.render("users/auth", response);
+        return res.render("users/auth", response);
       },
       json() {
-        res.json({
+        return res.json({
           id: req.user.id,
           status: "200",
           title: "Success",
           code: "success__user_already_auth",
           detail: "An existing user has already been authenticated",
           meta: {
-            alias: req.user.name.alias,
-          },
+            alias: req.user.name.alias
+          }
         });
       },
       default() {
-        res.render("users/auth", response);
+        return res.render("users/auth", response);
       }
     });
   } else {
@@ -306,13 +382,13 @@ exports.auth.check = (req, res) => {
     // return res.json(response);
     res.format({
       html() {
-        res.render("users/auth", response);
+        return res.render("users/auth", response);
       },
       json() {
-        res.json(response);
+        return res.json(response);
       },
       default() {
-        res.render("users/auth", response);
+        return res.render("users/auth", response);
       }
     });
   }
@@ -323,38 +399,57 @@ exports.auth.logout = (req, res) => {
   // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
   const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
-  res.redirect(`/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`);
+  return res.redirect(
+    `/users/logout?userIdBeingLoggedOut=${userIdBeingLoggedOut}`
+  );
 };
 
 exports.views.index = (req, res) => {
   // console.info("usersController.views.index(): View rendering of users index page. Invoked...");
-  res.render("users/index", {
+  return res.render("users/index", {
     title: "Users Index",
     content: "For users"
   });
 };
 
 exports.views.logout = (req, res) => {
-  console.info(
-    `usersController.views.logout(): Rendering view of a successful log out of user ${
-      req.query.userIdBeingLoggedOut
-    }. Invoked...`
-  );
-  res.render("users/index", {
+  // console.info(
+  //   `usersController.views.logout(): Rendering view of a successful log out of user ${
+  //     req.query.userIdBeingLoggedOut
+  //   }. Invoked...`
+  // );
+  return res.render("users/index", {
     title: "Successfully logged out",
-    content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
+    content: `This user has been logged out: ${
+      req.query.userIdBeingLoggedOut
+    }`
   });
 };
 
-exports.views.profile = (req, res) => {
-  console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
+exports.views.profile = (req, res, next) => {
+  // console.info("usersController.views.profile(): View rendering of user profile page. Invoked...");
   const alias = req.user ? req.user.name.alias : req.params.alias;
+  if (res.locals.errors && res.locals.errors.length > 0) {
+    return res.format({
+      html() {
+        next();
+      },
+      json() {
+        return res.json({
+          errors: res.locals.errors,
+        });
+      },
+      default() {
+        next();
+      }
+    });
+  }
   callback = (err, user) => {
     let data = {};
     if (!user) {
       data = {
         title: "Invalid user credentials",
-        user: null,
+        user: null
       };
     } else {
       data = {
@@ -363,22 +458,21 @@ exports.views.profile = (req, res) => {
           name: {
             first: user.name.first,
             last: user.name.last,
-            alias: user.name.alias,
+            alias: user.name.alias
           },
-          email: user.contact.email,
-        },
+          email: user.contact.email
+        }
       };
     }
-    
-    res.format({
+    return res.format({
       html() {
-        res.render("users/profile", data);
+        return res.render("users/profile", data);
       },
       json() {
-        res.json(data);
+        return res.json(data);
       },
       default() {
-        res.render("users/profile", response);
+        return res.render("users/profile", response);
       }
     });
   };
@@ -390,8 +484,34 @@ exports.views.profile = (req, res) => {
 
 exports.views.signup = (req, res) => {
   // console.info("usersController.views.signup(): View rendering of user profile page. Invoked...");
+  if (res.locals.errors && res.locals.errors.length > 0) {
+    const data = {
+      errors: res.locals.errors,
+    };
+    return res.format({
+      html() {
+        return res.render("users/signup", data);
+      },
+      json() {
+        return res.json(data);
+      },
+      default() {
+        return res.render("users/signup", data);
+      },
+    });
+  }
   if (req.user) {
     return res.redirect(`/users/profile/${req.user.name.alias}`);
   }
-  res.render("users/signup");
+  return res.format({
+    html() {
+      return res.render("users/signup");
+    },
+    json() {
+      return res.json(data);
+    },
+    default() {
+      return res.render("users/profile");
+    },
+  });
 };

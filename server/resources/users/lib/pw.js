@@ -83,19 +83,19 @@ const saltAndHasher = async params => {
     response.errors = errors;
     return response;
   }
-  console.info(" -> ...validated parameters.");
+  // console.info(" -> ...validated parameters.");
   const password = params.key.password;
   const saltRounds = parseInt(params.key.saltRounds);
   // console.info(' -> Validating password...');
   // console.info(' -> ...validated password.');
   // console.info(' -> Password should be between 20 chars to 160 chars.');
-  console.info(
-    " -> Generating salt-and-hashed password using a local strategy..."
-  );
+  // console.info(
+  //   " -> Generating salt-and-hashed password using a local strategy..."
+  // );
 
-  console.info(
-    "Wrapping bcrypt salting function in a promise in order to use await in this function..."
-  );
+  // console.info(
+  //   "Wrapping bcrypt salting function in a promise in order to use await in this function..."
+  // );
   const salt = await new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
       if (err) reject(err);
@@ -103,11 +103,11 @@ const saltAndHasher = async params => {
     });
   });
 
-  console.log(salt);
+  // console.log(salt);
 
-  console.info(
-    "Wrapping bcrypt hashing function in a promise in order to use await in this function..."
-  );
+  // console.info(
+  //   "Wrapping bcrypt hashing function in a promise in order to use await in this function..."
+  // );
   const hash = await new Promise((resolve, reject) => {
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) reject(err);
@@ -123,8 +123,8 @@ const saltAndHasher = async params => {
     id: data.length,
     type: "password",
     attributes: {
-      hash,
-    },
+      hash
+    }
   };
 
   data.push(datum);

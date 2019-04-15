@@ -33,7 +33,8 @@ router.get("/api/:alias", usersController.read.one);
 
 router.post("/auth/login", upload.none(), [
   usersController.auth.login,
-  usersController.views.profile
+  usersController.views.profile,
+  usersController.views.login
 ]);
 router.get("/auth", [usersController.auth.check]);
 router.get("/auth/logout", usersController.auth.logout);
