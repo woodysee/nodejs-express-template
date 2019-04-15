@@ -54,13 +54,13 @@ exports.create.one = (req, res, next) => {
           return res.redirect("/users/signup");
         },
         json() {
-      return res.json(response);
+          return res.json(response);
         },
         default() {
           console.error(response);
           res.locals.errors = response.errors;
           return res.redirect("/users/signup");
-    }
+        }
       });
     }
 
@@ -107,23 +107,16 @@ exports.create.one = (req, res, next) => {
         default() {
           console.error(encodeAttempt);
           return res.redirect("users/index");
-    }
+        }
       });
     }
 
-    // console.log(encodeAttempt);
-
-    for (i in encodeAttempt.data) {
-      let datum = encodeAttempt.data[i];
-      switch (datum.type) {
-        case "password":
-          newUser.password.hash = datum.attributes.hash;
-          newUser.password.strategy = strategyVersion;
-          break;
-        default:
-          break;
+    encodeAttempt.data.forEach(datum => {
+      if (datum.type === "password") {
+        newUser.password.hash = datum.attributes.hash;
+        newUser.password.strategy = strategyVersion;
       }
-    }
+    });
     newUser.save(err => {
       // console.log('Attempting to save new user...');
       if (err) {
@@ -164,8 +157,8 @@ exports.create.one = (req, res, next) => {
         default() {
           return res.render("users/index", response);
         }
+      });
     });
-  });
   });
 };
 
@@ -309,7 +302,7 @@ exports.auth.login = (req, res, next) => {
           },
           default() {
             return res.render("users/index", { errors: [err] });
-      }
+          }
         });
       }
       return res.redirect(`/users/profile/${user.name.alias}`);
@@ -379,7 +372,6 @@ exports.auth.check = (req, res) => {
       detail: "No authenticated user currently logged in"
     };
     response.errors.push(error);
-    // return res.json(response);
     res.format({
       html() {
         return res.render("users/auth", response);
@@ -420,9 +412,7 @@ exports.views.logout = (req, res) => {
   // );
   return res.render("users/index", {
     title: "Successfully logged out",
-    content: `This user has been logged out: ${
-      req.query.userIdBeingLoggedOut
-    }`
+    content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
   });
 };
 
@@ -441,7 +431,7 @@ exports.views.profile = (req, res, next) => {
       },
       default() {
         next();
-      }
+      },
     });
   }
   callback = (err, user) => {
@@ -449,7 +439,7 @@ exports.views.profile = (req, res, next) => {
     if (!user) {
       data = {
         title: "Invalid user credentials",
-        user: null
+        user: null,
       };
     } else {
       data = {
@@ -458,10 +448,10 @@ exports.views.profile = (req, res, next) => {
           name: {
             first: user.name.first,
             last: user.name.last,
-            alias: user.name.alias
+            alias: user.name.alias,
           },
-          email: user.contact.email
-        }
+          email: user.contact.email,
+        },
       };
     }
     return res.format({

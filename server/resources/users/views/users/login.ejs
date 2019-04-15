@@ -1,9 +1,9 @@
-<h1><%= title %></h1>
+<h1>Log in</h1>
 <form method="post" action="/users/auth/login" enctype="multipart/form-data">
   <% if (loginFailed) { %>
-    <div class="top-banner__login-failed">
+    <section class="top-banner__login-failed">
       Login has failed!
-    </div>
+    </section>
   <% } %>
   <input type="text" name="alias" placeholder="Username (alias)" autocomplete="off" />
   <input type="password" name="password" placeholder="Password" autocomplete="off" />
