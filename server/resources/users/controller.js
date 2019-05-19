@@ -347,14 +347,18 @@ exports.auth.check = (req, res) => {
       },
       json() {
         return res.json({
-          id: req.user.id,
-          status: '200',
-          title: 'Success',
-          code: 'success__user_already_auth',
-          detail: 'An existing user has already been authenticated',
-          meta: {
-            alias: req.user.name.alias
-          }
+          errors: [
+            {
+              id: req.user.id,
+              status: '200',
+              title: 'Success',
+              code: 'success__user_already_auth',
+              detail: 'An existing user has already been authenticated',
+              meta: {
+                alias: req.user.name.alias
+              }
+            }
+          ]
         });
       },
       default() {
@@ -398,15 +402,18 @@ exports.auth.logout = (req, res) => {
         });
       },
       json() {
-        return res.json([
-          {
-            id: 0,
-            status: '401',
-            title: 'Error',
-            code: 'error__users__no_auth_user',
-            detail: 'No authenticated user currently logged in to be logged out'
-          }
-        ]);
+        return res.json({
+          errors: [
+            {
+              id: 0,
+              status: '401',
+              title: 'Error',
+              code: 'error__users__no_auth_user',
+              detail:
+                'No authenticated user currently logged in to be logged out'
+            }
+          ]
+        });
       }
     });
   }
