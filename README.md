@@ -16,8 +16,13 @@ Each user account store [both password salt and hash](https://www.getdonedone.co
 - [OWASP](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Guidance)
 - [It's okay to store a salt next to a hash](https://security.stackexchange.com/questions/100898/why-store-a-salt-along-side-the-hashed-password)
 
+### Babel
+
+#### References
+- [Babel Node Guide](https://github.com/babel/example-node-server)
+
 ### Standardised request-response structure
-All requests and responses mostly follow the guidelines of [JSON API](http://jsonapi.org/format/) to allow for [consistent data models](https://nordicapis.com/the-benefits-of-using-json-api/) while having the benefit of a standardised interface via HTTP between client and server applications, either internal or external. Using JSON API apparently also allows for [pagination and take better advantage of HTTP caching](https://nordicapis.com/the-benefits-of-using-json-api/) which makes it suitable for template web applications compared to the trending API standard [GraphQL](https://graphql.org).
+All requests and responses mostly follow the guidelines of [JSON API](http://jsonapi.org/format/) to allow for [consistent data models](https://nordicapis.com/the-benefits-of-using-json-api/) while having the benefit of a standardised interface via HTTP between client and server applications, either internal or external.
 
 ### Server-side static view rendering using EJS
 
@@ -43,6 +48,13 @@ Dependencies:
   - [`cookie-parser`](https://www.npmjs.com/package/cookie-parser) - needed for passport local strategy
   - [`express-session`](https://www.npmjs.com/package/express-session) - needed for passport local strategy
   - [`connect-flash`](https://www.npmjs.com/package/connect-flash) - Flash messages which are stored in sessions
+
+Developer dependencies:
+
+- [`@babel/core`](https://www.npmjs.com/package/@babel/core) - Babel with Node.js
+- [`@babel/cli`](https://www.npmjs.com/package/@babel/cli) - Needed to use babel on the command line
+- [`@babel/node`](https://www.npmjs.com/package/@babel/node) - Babel with Node.js
+- [`@babel/preset-env`](https://www.npmjs.com/package/@babel/node) - Recommended by Babel
 
 ## Client app (web)
 

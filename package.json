@@ -21,7 +21,9 @@
     "uuid": "^3.3.2"
   },
   "scripts": {
-    "start": "node server/build/app.js",
+    "build": "babel server/app.js -d server/build",
+    "start": "npm run build && nodemon server/build/app.js",
+    "serve": "node server/build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,5 +33,11 @@
   "keywords": [],
   "author": "Woody See",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/woodysee/user-crud-mern#readme"
+  "homepage": "https://bitbucket.org/woodysee/user-crud-mern#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.4"
+  }
 }
