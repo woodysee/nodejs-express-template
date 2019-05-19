@@ -398,13 +398,15 @@ exports.auth.logout = (req, res) => {
         });
       },
       json() {
-        return res.json({
-          id: 0,
-          status: '401',
-          title: 'Error',
-          code: 'error__users__no_auth_user',
-          detail: 'No authenticated user currently logged in to be logged out'
-        });
+        return res.json([
+          {
+            id: 0,
+            status: '401',
+            title: 'Error',
+            code: 'error__users__no_auth_user',
+            detail: 'No authenticated user currently logged in to be logged out'
+          }
+        ]);
       }
     });
   }
