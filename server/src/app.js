@@ -1,9 +1,9 @@
 // console.info('Declaring dependencies...');
-require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const morgan = require("morgan");
-const flash = require("connect-flash");
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const flash = require('connect-flash');
 
 const app = express();
 
@@ -12,11 +12,11 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-require("./storage/logger")(app, morgan);
+require('./storage/logger')(app, morgan);
 
-app.use(require("cookie-parser")());
+app.use(require('cookie-parser')());
 app.use(
-  require("express-session")({
+  require('express-session')({
     cookie: {
       maxAge: 60000
     },
@@ -31,15 +31,15 @@ app.use(flash());
 // app.use(express.static(__dirname + "/../client/build"));
 
 // console.info('Initialising server-side view rendering...');
-require("./views")(app);
+require('./views')(app);
 
 // console.info("Initialising passport...");
-require("./resources/users/lib/passport.local")(app);
+require('./resources/users/lib/passport.local')(app);
 // console.info("Initialising passport local strategy...");
 
 // console.info('Loading resources...');
-app.use("/users", require("./resources/users"));
-app.use("/tasks", require("./resources/generic"));
+app.use('/users', require('./resources/users'));
+app.use('/tasks', require('./resources/generic'));
 
 /*
  **
@@ -51,7 +51,7 @@ app.use("/tasks", require("./resources/generic"));
 
 app.listen(process.env.SERVER__APP__PORT, () => {
   console.info(
-    "server/app.js: express.js server app is now running locally on port: " +
+    'server/app.js: express.js server app is now running locally on port: ' +
       process.env.SERVER__APP__PORT
   );
 });
