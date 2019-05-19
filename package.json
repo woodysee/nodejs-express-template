@@ -4,6 +4,7 @@
   "description": "A template with full RESTful user account management for user-account based web apps",
   "main": "server/app.js",
   "dependencies": {
+    "@babel/runtime": "^7.4.4",
     "bcrypt": "^3.0.5",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
@@ -38,6 +39,7 @@
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.4",
     "@babel/node": "^7.2.2",
+    "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/preset-env": "^7.4.4"
   }
 }

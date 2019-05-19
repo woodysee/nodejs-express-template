@@ -51,10 +51,12 @@ Dependencies:
 
 Developer dependencies:
 
-- [`@babel/core`](https://www.npmjs.com/package/@babel/core) - Babel with Node.js
-- [`@babel/cli`](https://www.npmjs.com/package/@babel/cli) - Needed to use babel on the command line
-- [`@babel/node`](https://www.npmjs.com/package/@babel/node) - Babel with Node.js
-- [`@babel/preset-env`](https://www.npmjs.com/package/@babel/node) - Recommended by Babel
+- [`@babel/core`](https://www.npmjs.com/package/@babel/core) - Foundation for Babel
+- [`@babel/cli`](https://www.npmjs.com/package/@babel/cli) - Lets Babel to be used on the command line
+- [`@babel/node`](https://www.npmjs.com/package/@babel/node) - Lets nodemon compiling with Babel presets and plugins
+- [`@babel/preset-env`](https://www.npmjs.com/package/@babel/node) - Let Babel automatically manage syntax transforms
+- [`@babel/plugin-transform-runtime`](https://babeljs.io/docs/en/6.26.3/babel-plugin-transform-runtime) - Used by Babel to [overcome regeneratorRuntime is not defined issues](https://github.com/babel/babel/issues/5085).
+- [`@babel/runtime`](https://babeljs.io/docs/en/babel-runtime) - Same as `babel-plugin-transform-runtime`, but for production.
 
 ## Client app (web)
 
