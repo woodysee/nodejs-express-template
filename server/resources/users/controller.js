@@ -4,16 +4,16 @@
 
 // console.info(`${metalog.name}: Loading controller...`);
 // console.info(`${metalog.prefix} Importing external dependencies...`);
-require("dotenv").config();
-const uuidv4 = require("uuid/v4");
-const uuidv5 = require("uuid/v5");
+require('dotenv').config();
+const uuidv4 = require('uuid/v4');
+const uuidv5 = require('uuid/v5');
 
 // console.info(`${metalog.prefix} ...imported external dependencies.`);
 // console.info(`${metalog.prefix} Importing internal dependencies...`);
-const passport = require("passport");
-const pw = require("./lib/pw");
-require("../../db/mongo")("for UserController.");
-const User = require("./model");
+const passport = require('passport');
+const pw = require('./lib/pw');
+require('../../db/mongo')('for UserController.');
+const User = require('./model');
 // console.info(`${metalog.prefix} ...imported internal dependencies.`);
 
 const strategyVersion = 0.1;
@@ -33,14 +33,14 @@ exports.create.one = (req, res, next) => {
   // console.info("usersController.create.one(): Creates a new user. Invoked...");
   const rawNewUserData = req.body;
   const alias = rawNewUserData.alias;
-  User.findOne({ "name.alias": alias }, async (err, existingUser) => {
+  User.findOne({ 'name.alias': alias }, async (err, existingUser) => {
     if (existingUser) {
       response.errors = [];
       const error = {
         id: response.errors.length,
-        status: "400",
-        code: "error__users__user_name_alias_already_taken",
-        title: "Error",
+        status: '400',
+        code: 'error__users__user_name_alias_already_taken',
+        title: 'Error',
         detail: `User name alias is already taken and must be unique.`,
         meta: {
           alias: existingUser.name.alias
@@ -51,7 +51,7 @@ exports.create.one = (req, res, next) => {
         html() {
           console.error(response);
           res.locals.errors = response.errors;
-          return res.redirect("/users/signup");
+          return res.redirect('/users/signup');
         },
         json() {
           return res.json(response);
@@ -59,7 +59,7 @@ exports.create.one = (req, res, next) => {
         default() {
           console.error(response);
           res.locals.errors = response.errors;
-          return res.redirect("/users/signup");
+          return res.redirect('/users/signup');
         }
       });
     }
@@ -80,20 +80,20 @@ exports.create.one = (req, res, next) => {
 
     // console.log("encodeAttempt: ", JSON.stringify(encodeAttempt));
 
-    if (typeof encodeAttempt === "undefined") {
+    if (typeof encodeAttempt === 'undefined') {
       response.errors = [];
       const error = {
         id: response.errors.length,
-        status: "500",
-        code: "error__users__pw_encoding_failed",
-        title: "Error",
+        status: '500',
+        code: 'error__users__pw_encoding_failed',
+        title: 'Error',
         detail: `Encoding password failed. This error handler was probably invoked without awaiting pw.permaEncode() to synchronously return the encoded password.`
       };
       response.errors.push(error);
       return res.json(response);
     }
 
-    const encodingHasErrors = typeof encodeAttempt.errors !== "undefined";
+    const encodingHasErrors = typeof encodeAttempt.errors !== 'undefined';
 
     if (encodingHasErrors) {
       return res.format({
@@ -106,13 +106,13 @@ exports.create.one = (req, res, next) => {
         },
         default() {
           console.error(encodeAttempt);
-          return res.redirect("users/index");
+          return res.redirect('users/index');
         }
       });
     }
 
     encodeAttempt.data.forEach(datum => {
-      if (datum.type === "password") {
+      if (datum.type === 'password') {
         newUser.password.hash = datum.attributes.hash;
         newUser.password.strategy = strategyVersion;
       }
@@ -121,13 +121,13 @@ exports.create.one = (req, res, next) => {
       // console.log('Attempting to save new user...');
       if (err) {
         response.errors = [];
-        console.error("Exception caught while saving user...");
+        console.error('Exception caught while saving user...');
         const error = {
           id: response.errors.length,
-          status: "500",
-          title: "Error",
-          code: "error__users__user_not_saved",
-          detail: "Failed to save new user",
+          status: '500',
+          title: 'Error',
+          code: 'error__users__user_not_saved',
+          detail: 'Failed to save new user',
           meta: err
         };
         response.errors.push(error);
@@ -138,9 +138,9 @@ exports.create.one = (req, res, next) => {
       response.data = [];
       const datum = {
         id: response.data.length,
-        status: "200",
-        code: "success__users__user_saved",
-        title: "Success",
+        status: '200',
+        code: 'success__users__user_saved',
+        title: 'Success',
         attributes: {
           alias: newUser.name.alias,
           email: newUser.contact.email
@@ -155,7 +155,7 @@ exports.create.one = (req, res, next) => {
           res.json(response);
         },
         default() {
-          return res.render("users/index", response);
+          return res.render('users/index', response);
         }
       });
     });
@@ -176,21 +176,21 @@ exports.read.one = (req, res, next) => {
     response.errors = [];
     const error = {
       id: response.errors.length,
-      status: "400",
-      code: "error__users__missing_params",
-      title: "Error",
+      status: '400',
+      code: 'error__users__missing_params',
+      title: 'Error',
       detail: `Missing parameters from request.`
     };
     response.errors.push(error);
     return res.format({
       html() {
-        return res.render("users/index", response);
+        return res.render('users/index', response);
       },
       json() {
         res.json(response);
       },
       default() {
-        return res.render("users/index", response);
+        return res.render('users/index', response);
       }
     });
   }
@@ -201,48 +201,48 @@ exports.read.one = (req, res, next) => {
       response.errors = [];
       const error = {
         id: response.errors.length,
-        status: "404",
-        code: "error__users__no_such_user",
-        title: "Error",
+        status: '404',
+        code: 'error__users__no_such_user',
+        title: 'Error',
         detail: `Unable to find user with alias: ${req.params.alias}.`,
         meta: err
       };
       response.errors.push(error);
       return res.format({
         html() {
-          return res.render("users/index", response);
+          return res.render('users/index', response);
         },
         json() {
           res.json(response);
         },
         default() {
-          return res.render("users/index", response);
+          return res.render('users/index', response);
         }
       });
     } else {
       response.data = [];
       const datum = {
         id: response.data.length,
-        type: "User found",
+        type: 'User found',
         attributes: user
       };
       response.data.push(datum);
       return res.format({
         html() {
-          return res.render("users/auth", response);
+          return res.render('users/auth', response);
         },
         json() {
           res.json(response);
         },
         default() {
-          return res.render("users/auth", response);
+          return res.render('users/auth', response);
         }
       });
     }
   };
 
   User.findOne()
-    .where("name.alias")
+    .where('name.alias')
     .equals(req.params.alias)
     .exec(callback);
 };
@@ -279,7 +279,7 @@ exports.delete.many = (req, res, next) => {
 exports.auth.login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
   // console.info(`Initialising JSON API v1 standard response structure...`);
-  passport.authenticate("local", function(errors, user) {
+  passport.authenticate('local', function(errors, user) {
     // console.log(errors, user);
     if (errors) {
       // console.error(errors);
@@ -295,13 +295,13 @@ exports.auth.login = (req, res, next) => {
         // console.error(err);
         return res.format({
           html() {
-            return res.render("users/index", { errors: [err] });
+            return res.render('users/index', { errors: [err] });
           },
           json() {
             res.json({ errors: [err] });
           },
           default() {
-            return res.render("users/index", { errors: [err] });
+            return res.render('users/index', { errors: [err] });
           }
         });
       }
@@ -317,12 +317,12 @@ exports.views.login = (req, res) => {
     return res.redirect(`/users/profile/${req.user.name.alias}`);
   }
   if (res.locals.errors && res.locals.errors.length > 0) {
-    return res.render("users/login", {
+    return res.render('users/login', {
       loginFailed: true,
       errors: res.locals.errors
     });
   }
-  return res.render("users/login", {
+  return res.render('users/login', {
     loginFailed: false
   });
 };
@@ -337,28 +337,28 @@ exports.auth.check = (req, res) => {
     response.data = [];
     const userDetail = {
       id: req.user.id,
-      type: "user",
+      type: 'user',
       attributes: req.user
     };
     response.data.push(userDetail);
     return res.format({
       html() {
-        return res.render("users/auth", response);
+        return res.render('users/auth', response);
       },
       json() {
         return res.json({
           id: req.user.id,
-          status: "200",
-          title: "Success",
-          code: "success__user_already_auth",
-          detail: "An existing user has already been authenticated",
+          status: '200',
+          title: 'Success',
+          code: 'success__user_already_auth',
+          detail: 'An existing user has already been authenticated',
           meta: {
             alias: req.user.name.alias
           }
         });
       },
       default() {
-        return res.render("users/auth", response);
+        return res.render('users/auth', response);
       }
     });
   } else {
@@ -366,21 +366,21 @@ exports.auth.check = (req, res) => {
     // console.error('...Exception caught while authenticating user.');
     const error = {
       id: response.errors.length,
-      status: "401",
-      title: "Error",
-      code: "error__users__no_auth_user",
-      detail: "No authenticated user currently logged in"
+      status: '401',
+      title: 'Error',
+      code: 'error__users__no_auth_user',
+      detail: 'No authenticated user currently logged in'
     };
     response.errors.push(error);
     res.format({
       html() {
-        return res.render("users/auth", response);
+        return res.render('users/auth', response);
       },
       json() {
         return res.json(response);
       },
       default() {
-        return res.render("users/auth", response);
+        return res.render('users/auth', response);
       }
     });
   }
@@ -389,6 +389,25 @@ exports.auth.check = (req, res) => {
 exports.auth.logout = (req, res) => {
   // console.log(req.user);
   // console.info(`usersController.auth.logout(): Logging out user ${req.user.name.alias}. Invoked...`);
+  if (!req.user) {
+    return res.format({
+      html() {
+        return res.render('users/index', {
+          title: 'No user to log out',
+          content: `No authenticated user currently logged in to be logged out`
+        });
+      },
+      json() {
+        return res.json({
+          id: 0,
+          status: '401',
+          title: 'Error',
+          code: 'error__users__no_auth_user',
+          detail: 'No authenticated user currently logged in to be logged out'
+        });
+      }
+    });
+  }
   const userIdBeingLoggedOut = req.user.name.alias;
   req.logout();
   return res.redirect(
@@ -398,9 +417,9 @@ exports.auth.logout = (req, res) => {
 
 exports.views.index = (req, res) => {
   // console.info("usersController.views.index(): View rendering of users index page. Invoked...");
-  return res.render("users/index", {
-    title: "Users Index",
-    content: "For users"
+  return res.render('users/index', {
+    title: 'Users Index',
+    content: 'For users'
   });
 };
 
@@ -410,8 +429,8 @@ exports.views.logout = (req, res) => {
   //     req.query.userIdBeingLoggedOut
   //   }. Invoked...`
   // );
-  return res.render("users/index", {
-    title: "Successfully logged out",
+  return res.render('users/index', {
+    title: 'Successfully logged out',
     content: `This user has been logged out: ${req.query.userIdBeingLoggedOut}`
   });
 };
@@ -426,48 +445,48 @@ exports.views.profile = (req, res, next) => {
       },
       json() {
         return res.json({
-          errors: res.locals.errors,
+          errors: res.locals.errors
         });
       },
       default() {
         next();
-      },
+      }
     });
   }
   callback = (err, user) => {
     let data = {};
     if (!user) {
       data = {
-        title: "Invalid user credentials",
-        user: null,
+        title: 'Invalid user credentials',
+        user: null
       };
     } else {
       data = {
-        title: "User Profile",
+        title: 'User Profile',
         user: {
           name: {
             first: user.name.first,
             last: user.name.last,
-            alias: user.name.alias,
+            alias: user.name.alias
           },
-          email: user.contact.email,
-        },
+          email: user.contact.email
+        }
       };
     }
     return res.format({
       html() {
-        return res.render("users/profile", data);
+        return res.render('users/profile', data);
       },
       json() {
         return res.json(data);
       },
       default() {
-        return res.render("users/profile", response);
+        return res.render('users/profile', response);
       }
     });
   };
   User.findOne()
-    .where("name.alias")
+    .where('name.alias')
     .equals(alias)
     .exec(callback);
 };
@@ -476,18 +495,18 @@ exports.views.signup = (req, res) => {
   // console.info("usersController.views.signup(): View rendering of user profile page. Invoked...");
   if (res.locals.errors && res.locals.errors.length > 0) {
     const data = {
-      errors: res.locals.errors,
+      errors: res.locals.errors
     };
     return res.format({
       html() {
-        return res.render("users/signup", data);
+        return res.render('users/signup', data);
       },
       json() {
         return res.json(data);
       },
       default() {
-        return res.render("users/signup", data);
-      },
+        return res.render('users/signup', data);
+      }
     });
   }
   if (req.user) {
@@ -495,13 +514,13 @@ exports.views.signup = (req, res) => {
   }
   return res.format({
     html() {
-      return res.render("users/signup");
+      return res.render('users/signup');
     },
     json() {
       return res.json(data);
     },
     default() {
-      return res.render("users/profile");
-    },
+      return res.render('users/profile');
+    }
   });
 };
