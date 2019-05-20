@@ -24,7 +24,7 @@
   "scripts": {
     "build": "babel server/src/ --out-dir server/build --copy-files --source-maps 'inline' --ignore 'src /**/*.spec.js','src /**/*.test.js'",
     "inspect": "npm run build && node -r source-map-support/register server/build/app.js",
-    "start": "npm run build && nodemon --verbose --watch server/src --ext ejs,js,json --exec 'npm run inspect'",
+    "start": "nodemon --verbose --watch server/src --ext ejs,js,json --exec 'npm run inspect'",
     "serve": "node server/build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
