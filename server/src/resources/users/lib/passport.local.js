@@ -1,17 +1,19 @@
 // Adapted from Jared Hanson https://github.com/passport/express-4.x-local-example/blob/master/server.js
 // console.info('Declaring dependencies...');
-require("dotenv").config();
-const bcrypt = require("bcrypt");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-require("../../../db/mongo")("for user authentication.");
-const User = require("../model");
+require('dotenv').config();
+import { compare } from 'bcrypt';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { initialiseMongoConnection } from '../../../db/mongo';
+import { findOne } from '../model';
 
-module.exports = app => {
+initialiseMongoConnection('for user authentication.');
+
+export const configureLocalPassportStrategy = app => {
   // Use application-level middleware for common functionality, including
   // logging, parsing, and session handling.
 
-  // Initialize Passport and restore authentication state, if any, from the
+  // passport.initialize Passport and restore authentication state, if any, from the
   // session.
   app.use(passport.initialize());
   app.use(passport.session()); // express-session must be initialised first
@@ -28,43 +30,43 @@ module.exports = app => {
   passport.use(
     new LocalStrategy(
       {
-        usernameField: "alias",
-        passwordField: "password",
+        usernameField: 'alias',
+        passwordField: 'password',
         passReqToCallback: true,
-        session: false
+        session: false,
       },
       function(req, alias, password, done) {
         // console.info(`Invoked local user authentication strategy using Passport.js.`)
         // console.warn(`(Debug) Receiving ${req.url}`);
         // console.log("(Debug) Query from client: alias - ", alias);
         // console.log("(Debug) Query from client: password - ", password);
-        User.findOne({ "name.alias": alias }, async (err, user) => {
+        findOne({ 'name.alias': alias }, async (err, user) => {
           const errors = [];
           if (err) {
             // console.error(`Error occurred while finding user in the DB:`);
             // console.error(err);
             errors.push({
               id: errors.length,
-              status: "500",
-              code: "error__db_query_failed",
-              title: "Error",
+              status: '500',
+              code: 'error__db_query_failed',
+              title: 'Error',
               detail: `Unable to execute query to find the user to authenticate with the alias provided.`,
               meta: {
-                alias
-              }
+                alias,
+              },
             });
           }
           if (!user) {
             // console.error(`No such user found:`);
             errors.push({
               id: errors.length,
-              status: "400",
-              code: "error__no_user",
-              title: "Error",
+              status: '400',
+              code: 'error__no_user',
+              title: 'Error',
               detail: `Unable to find the user with the alias provided.`,
               meta: {
-                alias
-              }
+                alias,
+              },
             });
             return done(errors, false);
           }
@@ -75,10 +77,10 @@ module.exports = app => {
             // console.error("Invalid user.");
             errors.push({
               id: errors.length,
-              status: "400",
-              code: "error__invalid_user",
-              title: "Error",
-              detail: `No such user with alias ${user.name.alias}.`
+              status: '400',
+              code: 'error__invalid_user',
+              title: 'Error',
+              detail: `No such user with alias ${user.name.alias}.`,
             });
             return done(errors, false);
           }
@@ -86,7 +88,7 @@ module.exports = app => {
           const hash = user.password.hash;
 
           const passwordsMatch = await new Promise((resolve, reject) => {
-            bcrypt.compare(password, hash, (err, hash) => {
+            compare(password, hash, (err, hash) => {
               if (err) reject(err);
               resolve(hash);
             });
@@ -98,10 +100,10 @@ module.exports = app => {
             // console.error("Invalid password.");
             errors.push({
               id: errors.length,
-              status: "400",
-              code: "error__wrong_pw",
-              title: "Error",
-              detail: `Incorrect password.`
+              status: '400',
+              code: 'error__wrong_pw',
+              title: 'Error',
+              detail: `Incorrect password.`,
             });
             return done(errors, false);
           }
@@ -132,7 +134,7 @@ module.exports = app => {
 
   passport.deserializeUser(function(alias, cb) {
     // console.log("Querying database with alias:", alias);
-    User.findOne({ "name.alias": alias }, function(err, user) {
+    findOne({ 'name.alias': alias }, function(err, user) {
       if (err) {
         // console.log("Unable to find user to deserialise user.");
         return cb(err);
@@ -146,6 +148,6 @@ module.exports = app => {
 
   return {
     app: app,
-    passport: passport
+    passport: passport,
   };
 };

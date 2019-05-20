@@ -1,12 +1,14 @@
-// const metalog = {};
-// metalog.name = 'Users';
-// metalog.prefix = ` ->`;
+// const metalog = {
+//   resource: {
+//     title: 'Users',
+//   },
+//   prefix: ' ->',
+// };
 
 // console.info(`${metalog.prefix} Loading ${metalog.name} model...`);
 // console.info(`  ${metalog.prefix} Importing dependencies...`);
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import { Schema, model } from 'mongoose';
 
 // console.info(`  ${metalog.prefix} ...imported dependencies.`);
 
@@ -16,21 +18,21 @@ const userSchema = new Schema(
     name: {
       first: { type: String },
       last: { type: String },
-      alias: { type: String, unique: true }
+      alias: { type: String, unique: true },
     },
     contact: {
-      email: { type: String }
+      email: { type: String },
     },
     password: {
       hash: { type: String },
-      strategy: { type: String }
-    }
+      strategy: { type: String },
+    },
   },
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+const User = model('User', userSchema);
 
 // console.info(`${metalog.prefix} ...Loaded ${metalog.name} model.`);
 
-module.exports = User;
+export default User;

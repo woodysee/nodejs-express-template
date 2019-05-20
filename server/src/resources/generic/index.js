@@ -1,29 +1,33 @@
-const metalog = {};
-metalog.resource = {};
-metalog.resource.title = 'Generic Resource';
-metalog.prefix = ` ->`;
+const metalog = {
+  resource: {
+    title: 'Generic Resource',
+  },
+  prefix: ' ->',
+};
 
 console.info(`${metalog.resource.title}: Loading resource...`);
 console.info(`${metalog.prefix} Importing dependencies...`);
 
-const express = require("express");
-const router = express.Router();
-const controller = require("./controller");
+// import express from 'express';
+const express = require('express');
+import genericController from './controller';
 
 console.info(`${metalog.prefix} ...imported dependencies.`);
 
-router.post("/", controller.create.one);
-router.post("/many", controller.create.many);
+const router = express.Router();
 
-router.get("/:id", controller.read.one);
-router.get("/", controller.read.many);
+router.post('/', genericController.create.one);
+router.post('/many', genericController.create.many);
 
-router.put("/:id", controller.update.one);
-router.put("/", controller.update.many);
+router.get('/:id', genericController.read.one);
+router.get('/', genericController.read.many);
 
-router.delete("/:id", controller.delete.one);
-router.delete("/", controller.delete.many);
+router.put('/:id', genericController.update.one);
+router.put('/', genericController.update.many);
+
+router.delete('/:id', genericController.delete.one);
+router.delete('/', genericController.delete.many);
 
 console.info(`${metalog.resource.title}: ...Loaded resource.`);
 
-module.exports = router;
+export default router;

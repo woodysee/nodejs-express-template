@@ -5,41 +5,60 @@ metalog.resource.singular = `generic resource`;
 metalog.resource.plural = `generic resources`;
 metalog.resource.controller = `genericController`;
 
-exports.create = {};
-exports.read = {};
-exports.update = {};
-exports.delete = {};
+const create = {};
+const read = {};
+const update = {};
+const remove = {};
 
-exports.create.one = (req, res, next) => {
+const createOne = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.create.one(): Create a ${metalog.resource.singular}. Invoked...`);
 };
 
-exports.create.many = (req, res, next) => {
+const createMany = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.create.many(): Creates ${metalog.resource.plural}. Invoked...`);
 };
 
-exports.read.one = (req, res, next) => {
+const readOne = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.read.one(): Show ${metalog.resource.singular} details. Invoked...`);
 };
 
-exports.read.many = (req, res, next) => {
+const readMany = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.read.many(): Show details of ${metalog.resource.plural}. Invoked...`);
 };
 
-exports.update.one = (req, res, next) => {
+const updateOne = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.update.one(): Update details of a ${metalog.resource.singular}. Invoked...`);
 };
 
-exports.update.many = (req, res, next) => {
+const updateMany = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.update.many(): Update info of many ${metalog.resource.plural}. Invoked...`);
 };
 
-exports.delete.one = (req, res, next) => {
+const deleteOne = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.delete.one(): Destroy ${metalog.resource.singular}. Invoked...`);
 };
 
-exports.delete.many = (req, res, next) => {
+const deleteMany = (req, res, next) => {
   // console.info(`${metalog.resource.controller}.delete.one(): Destroy many ${metalog.resource.plural}. Invoked...`);
 };
 
 // console.info(`...initialised RESTful resources of ${metalog.resource.plural}.`);
+
+export default {
+  create: {
+    one: createOne,
+    many: createMany,
+  },
+  read: {
+    one: readOne,
+    many: readMany,
+  },
+  update: {
+    one: updateOne,
+    many: updateMany,
+  },
+  delete: {
+    one: deleteOne,
+    many: deleteMany,
+  },
+};

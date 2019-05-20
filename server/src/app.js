@@ -6,6 +6,9 @@ import morgan from 'morgan';
 import flash from 'connect-flash';
 import { initialiseViews } from './views';
 import { initialiseLogger } from './storage/logger';
+import { configureLocalPassportStrategy } from './resources/users/lib/passport.local';
+import usersResource from './resources/users';
+import genericResource from './resources/generic';
 
 const app = express();
 
@@ -36,12 +39,13 @@ app.use(flash());
 initialiseViews(app);
 
 // console.info("Initialising passport...");
-require('./resources/users/lib/passport.local')(app);
+// console.info("Initialising passport...");
+configureLocalPassportStrategy(app);
 // console.info("Initialising passport local strategy...");
 
 // console.info('Loading resources...');
-app.use('/users', require('./resources/users'));
-app.use('/tasks', require('./resources/generic'));
+app.use('/users', usersResource);
+app.use('/tasks', genericResource);
 
 /*
  **

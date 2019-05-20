@@ -1,5 +1,5 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
 const selectLocalCipher = params => {
   let response = {};
@@ -10,8 +10,8 @@ const selectLocalCipher = params => {
         id: response.data.length,
         type: '0.1',
         attributes: {
-          saltRounds: parseInt(process.env.SERVER__USER__PW__V0_1_SALT_ROUNDS)
-        }
+          saltRounds: parseInt(process.env.SERVER__USER__PW__V0_1_SALT_ROUNDS),
+        },
       };
       response.data.push(strategy);
       return response;
@@ -37,8 +37,8 @@ const selectPepper = params => {
         version: version,
         key: {
           password: peppered,
-          saltRounds: params.key.saltRounds
-        }
+          saltRounds: params.key.saltRounds,
+        },
       };
     }
     default: {
@@ -58,7 +58,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_pw',
       title: 'Missing parameter',
-      detail: 'No params.unencoded (string)'
+      detail: 'No params.unencoded (string)',
     };
     errors.push(errorAsNoPassWordToEncode);
   }
@@ -68,7 +68,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_salt_rounds',
       title: 'Missing parameter',
-      detail: 'No params.saltRounds (integer)'
+      detail: 'No params.saltRounds (integer)',
     };
     errors.push(errorAsNoSaltRoundsDeclared);
   }
@@ -78,7 +78,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_version',
       title: 'Missing parameter',
-      detail: 'No params.version (string)'
+      detail: 'No params.version (string)',
     };
     errors.push(errorAsNoPasswordStrategyVersion);
   }
@@ -127,8 +127,8 @@ const saltAndHasher = async params => {
     id: data.length,
     type: 'password',
     attributes: {
-      hash
-    }
+      hash,
+    },
   };
 
   data.push(datum);
@@ -136,7 +136,7 @@ const saltAndHasher = async params => {
   return response;
 };
 
-exports.encipher = params => {
+export const encipher = params => {
   // console.info("password.encipher() - version switch to decide which strategy to permanently encode password for storing or comparing");
   // console.log("encipher -> params:", params);
   let response = {};
@@ -148,7 +148,7 @@ exports.encipher = params => {
       status: '400',
       code: 'error__password__sah_no_version',
       title: 'Missing parameter',
-      detail: 'No params.version (string)'
+      detail: 'No params.version (string)',
     };
     errors.push(errorAsNoPasswordStrategyVersion);
   }
@@ -158,7 +158,7 @@ exports.encipher = params => {
       status: '400',
       code: 'error__password__sah_no_pw',
       title: 'Missing parameter',
-      detail: 'No params.unencoded (string)'
+      detail: 'No params.unencoded (string)',
     };
     errors.push(errorAsNoPassWordToEncode);
   }
@@ -178,7 +178,7 @@ exports.encipher = params => {
       status: '500',
       code: 'error__password__invalid_cipher',
       title: 'Error',
-      detail: 'Invalid password strategy details'
+      detail: 'Invalid password strategy details',
     };
     errors.push(error);
     response.errors = errors;
@@ -198,7 +198,7 @@ exports.encipher = params => {
       params.key.saltRounds = cipher.attributes.saltRounds;
       const pepperedArguments = selectPepper({
         version,
-        key: params.key
+        key: params.key,
       });
       const response = saltAndHasher(pepperedArguments);
       return response;
@@ -210,7 +210,7 @@ exports.encipher = params => {
         status: '400',
         code: 'error__password__invalid_strategy_version',
         title: 'Error',
-        detail: 'Version of the password strategy not recognised'
+        detail: 'Version of the password strategy not recognised',
       };
       errors.push(error);
       response.errors = errors;

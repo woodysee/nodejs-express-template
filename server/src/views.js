@@ -1,5 +1,5 @@
 import { renderFile } from 'ejs';
-import { static as expressStatic } from 'express';
+import { static as serveStatic } from 'express';
 
 export const initialiseViews = app => {
   const resources = ['users', 'generic']; // <-- You can add more resource-specific views by adding in here
@@ -16,7 +16,7 @@ export const initialiseViews = app => {
 
   const ejsOptions = { delimiter: '?' };
   app.set('views', locations);
-  app.use('/', expressStatic(`${__dirname}/${clientLocation}`)); // Single Page Application
+  app.use('/', serveStatic(`${__dirname}/${clientLocation}`)); // Single Page Application
   // Reference: https://stackoverflow.com/questions/43261318/node-js-express-how-do-i-render-a-file-that-is-inside-views-subfolder
   app.set('view engine', 'ejs');
   app.engine('html', (path, data, cb) => {
