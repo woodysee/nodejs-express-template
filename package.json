@@ -2,7 +2,7 @@
   "name": "nodejs-server-app",
   "version": "0.1.0",
   "description": "A template with full RESTful user account management for user-account based web apps",
-  "main": "server/app.js",
+  "main": "server/build/app.js",
   "dependencies": {
     "@babel/runtime": "^7.4.4",
     "bcrypt": "^3.0.5",
@@ -23,7 +23,8 @@
   },
   "scripts": {
     "build": "babel server/src/ -d server/build --copy-files",
-    "start": "npm run build && nodemon server/src/app.js",
+    "inspect": "npm run build && node --inspect server/build/app.js",
+    "start": "npm run build && nodemon --verbose --watch server/src --ext ejs,js,json --exec 'npm run inspect'",
     "serve": "node server/build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
