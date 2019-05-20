@@ -53,9 +53,10 @@ Developer dependencies:
 - [`@babel/preset-env`](https://www.npmjs.com/package/@babel/node) - Let Babel automatically manage syntax transforms
 - [`@babel/plugin-transform-runtime`](https://babeljs.io/docs/en/6.26.3/babel-plugin-transform-runtime) - Used by Babel to [overcome regeneratorRuntime is not defined issues](https://github.com/babel/babel/issues/5085).
 - [`@babel/runtime`](https://babeljs.io/docs/en/babel-runtime) - Same as `babel-plugin-transform-runtime`, but for production.
-- [`eslint`]() - Makes code consistent
-- [`eslint-config-airbnb-base@13.1.0`]() - Installed automatically when initialising eslint for AirBNB styleguide
-- [`eslint-plugin-import@2.17.2`]() - Installed automatically when initialising eslint for JavaScript modules
+- [`eslint`](https://eslint.org) - Makes code consistent
+- [`eslint-config-airbnb-base`](https://www.npmjs.com/package/eslint-config-airbnb-base) - Installed automatically when initialising eslint for AirBNB styleguide
+- [`eslint-plugin-import`](https://www.npmjs.com/package/eslint-plugin-import) - Installed automatically when initialising eslint for JavaScript modules
+- [`node-source-map-support`](https://github.com/evanw/node-source-map-support) - For error tracing to the `src/` folder during development and debugging in conjunction with enabling Babel's native source mapping being implemented in npm scripts
 
 ## Client app (web)
 
