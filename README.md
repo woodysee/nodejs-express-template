@@ -7,30 +7,26 @@ A template with full RESTful user account management for user-account based web 
 - Views: EJS
 
 ## Features of this template
+
 ### Resource-based hierarchy
+
 Breaking the server directory structure into resources of business logic each with its inner MVC framework (i.e. product-centric) instead of the usual MVC monolithic framework: https://github.com/i0natan/nodebestpractices/blob/master/sections/projectstructre/breakintresources.md
+
 ### Local login strategy
+
 Each user account store [both password salt and hash](https://www.getdonedone.com/building-the-optimal-user-database-model-for-your-application/) in a version-specific strategy to allow for future implementations of more secure password encryption/one-way-encoding strategies while allowing for backward compatibility of accomodating existing users with  encrypted/one-way-encoded passwords stored with older strategies.
-#### References
 
-- [OWASP](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Guidance)
-- [It's okay to store a salt next to a hash](https://security.stackexchange.com/questions/100898/why-store-a-salt-along-side-the-hashed-password)
+### Style guide
 
-### Babel
-
-#### References
-- [Babel Node Guide](https://github.com/babel/example-node-server)
+Uses AirBNB enforced by `eslint`.
 
 ### Standardised request-response structure
+
 All requests and responses mostly follow the guidelines of [JSON API](http://jsonapi.org/format/) to allow for [consistent data models](https://nordicapis.com/the-benefits-of-using-json-api/) while having the benefit of a standardised interface via HTTP between client and server applications, either internal or external.
 
 ### Server-side static view rendering using EJS
 
 Each resource has its own set of `/views/{resource}` and SHOULD be located within a folder with the name `{resource}` within its own `views/` folder. All of the `views/` folders for each initalised component will share the hierarchy, and this is to prevent conflicting file pointers during `res.render`, e.g. `server/resources/users/views/index.ejs refer to the same file as client/views/index.ejs`.
-
-#### References
-
-- [Declare multiple views locations in Express](https://stackoverflow.com/questions/11315351/multiple-view-paths-on-node-js-express)
 
 ## Server app
 
@@ -57,6 +53,9 @@ Developer dependencies:
 - [`@babel/preset-env`](https://www.npmjs.com/package/@babel/node) - Let Babel automatically manage syntax transforms
 - [`@babel/plugin-transform-runtime`](https://babeljs.io/docs/en/6.26.3/babel-plugin-transform-runtime) - Used by Babel to [overcome regeneratorRuntime is not defined issues](https://github.com/babel/babel/issues/5085).
 - [`@babel/runtime`](https://babeljs.io/docs/en/babel-runtime) - Same as `babel-plugin-transform-runtime`, but for production.
+- [`eslint`]() - Makes code consistent
+- [`eslint-config-airbnb-base@13.1.0`]() - Installed automatically when initialising eslint for AirBNB styleguide
+- [`eslint-plugin-import@2.17.2`]() - Installed automatically when initialising eslint for JavaScript modules
 
 ## Client app (web)
 
@@ -81,9 +80,14 @@ Create the following tables:
 
 - `users`
 
-## References
+#### References
 
-# Miscellenous references
+- [Declare multiple views locations in Express](https://stackoverflow.com/questions/11315351/multiple-view-paths-on-node-js-express)
+- [Babel Node Guide](https://github.com/babel/example-node-server)
+- [OWASP](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Guidance)
+- [It's okay to store a salt next to a hash](https://security.stackexchange.com/questions/100898/why-store-a-salt-along-side-the-hashed-password)
+
+# Other notes
 
 - Deciding on a full stack framework: https://webinerds.com/6-web-development-stacks-try-2017/ 
 - Best practices informational resource: https://github.com/i0natan/nodebestpractices#1-project-structure-practices

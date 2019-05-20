@@ -1,0 +1,6 @@
+/client/**
+/node_modules/**
+/server/build/**
+.eslintrc.js
+package-lock.json
+package.json
