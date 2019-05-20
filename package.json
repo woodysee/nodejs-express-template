@@ -22,7 +22,7 @@
     "uuid": "^3.3.2"
   },
   "scripts": {
-    "build": "babel server/src/ -d server/build",
+    "build": "babel server/src/ -d server/build --copy-files",
     "start": "npm run build && nodemon server/build/app.js",
     "serve": "node server/build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
