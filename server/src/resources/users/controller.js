@@ -99,7 +99,7 @@ exports.create.one = (req, res, next) => {
       return res.format({
         html() {
           console.error(encodeAttempt);
-          return res.redirect(`users/index`);
+          return res.redirect(`/users/index`);
         },
         json() {
           res.json(encodeAttempt);
@@ -149,7 +149,7 @@ exports.create.one = (req, res, next) => {
       response.data.push(datum);
       return res.format({
         html() {
-          return res.redirect(`users/profile/${newUser.name.alias}`);
+          return res.redirect(`/users/profile/${newUser.name.alias}`);
         },
         json() {
           res.json(response);
