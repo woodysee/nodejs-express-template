@@ -195,7 +195,7 @@ exports.read.one = (req, res, next) => {
     });
   }
 
-  callback = (err, user) => {
+  const callback = (err, user) => {
     if (user === null) {
       // console.error("...user not found.");
       response.errors = [];

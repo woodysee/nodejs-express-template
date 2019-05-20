@@ -51,7 +51,7 @@ app.use('/tasks', require('./resources/generic'));
 
 app.listen(process.env.SERVER__APP__PORT, () => {
   console.info(
-    'server/app.js: express.js server app is now running locally on port: ' +
+    'server/build/app.js: express.js server app is now running locally on port: ' +
       process.env.SERVER__APP__PORT
   );
 });

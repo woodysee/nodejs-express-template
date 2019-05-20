@@ -10,8 +10,8 @@ const selectLocalCipher = params => {
         id: response.data.length,
         type: '0.1',
         attributes: {
-          saltRounds: parseInt(process.env.SERVER__USER__PW__V0_1_SALT_ROUNDS),
-        },
+          saltRounds: parseInt(process.env.SERVER__USER__PW__V0_1_SALT_ROUNDS)
+        }
       };
       response.data.push(strategy);
       return response;
@@ -24,7 +24,7 @@ const selectLocalCipher = params => {
 
 const selectPepper = params => {
   const version = params.version;
-  let password = params.key.password;
+  const password = params.key.password;
   switch (params.version) {
     case 0.1: {
       /*
@@ -37,8 +37,8 @@ const selectPepper = params => {
         version: version,
         key: {
           password: peppered,
-          saltRounds: params.key.saltRounds,
-        },
+          saltRounds: params.key.saltRounds
+        }
       };
     }
     default: {
@@ -58,7 +58,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_pw',
       title: 'Missing parameter',
-      detail: 'No params.unencoded (string)',
+      detail: 'No params.unencoded (string)'
     };
     errors.push(errorAsNoPassWordToEncode);
   }
@@ -68,7 +68,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_salt_rounds',
       title: 'Missing parameter',
-      detail: 'No params.saltRounds (integer)',
+      detail: 'No params.saltRounds (integer)'
     };
     errors.push(errorAsNoSaltRoundsDeclared);
   }
@@ -78,7 +78,7 @@ const saltAndHasher = async params => {
       status: '400',
       code: 'error__password__sah_no_version',
       title: 'Missing parameter',
-      detail: 'No params.version (string)',
+      detail: 'No params.version (string)'
     };
     errors.push(errorAsNoPasswordStrategyVersion);
   }
@@ -127,8 +127,8 @@ const saltAndHasher = async params => {
     id: data.length,
     type: 'password',
     attributes: {
-      hash,
-    },
+      hash
+    }
   };
 
   data.push(datum);
@@ -196,7 +196,7 @@ exports.encipher = params => {
     }
     case 0.1: {
       params.key.saltRounds = cipher.attributes.saltRounds;
-      pepperedArguments = selectPepper({
+      const pepperedArguments = selectPepper({
         version,
         key: params.key
       });
