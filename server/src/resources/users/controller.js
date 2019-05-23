@@ -13,7 +13,7 @@ import uuidv5 from 'uuid/v5';
 
 // console.info(`${metalog.prefix} ...imported external dependencies.`);
 // console.info(`${metalog.prefix} Importing internal dependencies...`);
-import { authenticate } from 'passport';
+import passport from 'passport';
 import { encipher } from './lib/pw';
 import { initialiseMongoConnection } from '../../db/mongo';
 import User from './model';
@@ -275,8 +275,8 @@ const removeMany = (req, res, next) => {
 const login = (req, res, next) => {
   // console.info("usersController.login(): Processes user login credentials and enables persistent server user session.");
   // console.info(`Initialising JSON API v1 standard response structure...`);
-  authenticate('local', function(errors, user) {
-    // console.log(errors, user);
+  passport.authenticate('local', function(errors, user) {
+    console.log(errors, user);
     if (errors) {
       // console.error(errors);
       res.locals.errors = errors;

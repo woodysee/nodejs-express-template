@@ -5,7 +5,7 @@ import { compare } from 'bcrypt';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { initialiseMongoConnection } from '../../../db/mongo';
-import { findOne } from '../model';
+import User from '../model';
 
 initialiseMongoConnection('for user authentication.');
 
@@ -40,7 +40,7 @@ export const configureLocalPassportStrategy = app => {
         // console.warn(`(Debug) Receiving ${req.url}`);
         // console.log("(Debug) Query from client: alias - ", alias);
         // console.log("(Debug) Query from client: password - ", password);
-        findOne({ 'name.alias': alias }, async (err, user) => {
+        User.findOne({ 'name.alias': alias }, async (err, user) => {
           const errors = [];
           if (err) {
             // console.error(`Error occurred while finding user in the DB:`);
@@ -134,7 +134,7 @@ export const configureLocalPassportStrategy = app => {
 
   passport.deserializeUser(function(alias, cb) {
     // console.log("Querying database with alias:", alias);
-    findOne({ 'name.alias': alias }, function(err, user) {
+    User.findOne({ 'name.alias': alias }, function(err, user) {
       if (err) {
         // console.log("Unable to find user to deserialise user.");
         return cb(err);
