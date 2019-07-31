@@ -4,21 +4,21 @@
   "description": "A template with full RESTful user account management for user-account based web apps",
   "main": "server/build/app.js",
   "dependencies": {
-    "@babel/runtime": "^7.4.5",
+    "@babel/runtime": "^7.5.5",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.4",
     "dotenv": "^5.0.1",
-    "ejs": "^2.6.1",
-    "express": "^4.17.0",
-    "express-session": "^1.16.1",
-    "mongoose": "^5.5.11",
+    "ejs": "^2.6.2",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "mongoose": "^5.6.7",
     "morgan": "^1.9.1",
-    "multer": "^1.4.1",
+    "multer": "^1.4.2",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "rotating-file-stream": "^1.4.1",
+    "rotating-file-stream": "^1.4.3",
     "uuid": "^3.3.2"
   },
   "scripts": {
@@ -37,15 +37,15 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/woodysee/user-crud-mern#readme",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
-    "@babel/plugin-transform-runtime": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
     "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.17.2",
-    "prettier": "^1.17.1",
-    "source-map-support": "^0.5.12"
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.18.2",
+    "prettier": "^1.18.2",
+    "source-map-support": "^0.5.13"
   }
 }
