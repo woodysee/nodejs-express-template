@@ -8,8 +8,7 @@
 // console.info(`${metalog.name}: Loading controller...`);
 // console.info(`${metalog.prefix} Importing external dependencies...`);
 require('dotenv').config();
-import uuidv4 from 'uuid/v4';
-import uuidv5 from 'uuid/v5';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 // console.info(`${metalog.prefix} ...imported external dependencies.`);
 // console.info(`${metalog.prefix} Importing internal dependencies...`);

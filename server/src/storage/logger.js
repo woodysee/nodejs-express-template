@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import rfs from 'rotating-file-stream';
+import { createStream } from 'rotating-file-stream';
 const logDirectory = join(__dirname, 'logs');
 
 export const initialiseLogger = (app, morgan) => {
@@ -8,7 +8,7 @@ export const initialiseLogger = (app, morgan) => {
   existsSync(logDirectory) || mkdirSync(logDirectory);
 
   // console.log("Creating a rotating write stream...");
-  const accessLogStream = rfs('requests.log', {
+  const accessLogStream = createStream('requests.log', {
     interval: '1d', // New log file daily
     path: logDirectory,
   });
